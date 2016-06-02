@@ -18,8 +18,12 @@ class SchedulerWorker
     {
         $stopwatchStart = time();
         while ($n !== 0) {
-            $received = $this->implementation->getSchedulerAdapter()
-                ->awaitScheduledCommand($this->implementation->getClock(), $time);
+            try {
+                $received = $this->implementation->getSchedulerAdapter()
+                    ->awaitScheduledCommand($this->implementation->getClock(), $time);
+            } catch (TimeoutException $e) {
+                break;
+            }
             $this->implementation->getQueueAdapter()
                 ->queueCommand(
                     $received->getQueueName(),
