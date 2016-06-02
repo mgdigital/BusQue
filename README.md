@@ -29,6 +29,8 @@ Example
 
     <?php
     
+    use MGDigital\BusQue as BusQue;
+    
     $command = new SendEmailCommand('joe@example.com', 'Hello Joe!');
     
     $commandBus->handle(new BusQue\QueuedCommand($command));
@@ -40,7 +42,7 @@ Example
     
     // or in your Symfony app run app/console busque:queue_worker SendEmailCommand
     
-    $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute'));
+    $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
     
     $schedulerWorker = new BusQue\SchedulerWorker($implementation);
     $schedulerWorker->work();
