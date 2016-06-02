@@ -76,16 +76,14 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     public function setCommandCompleted(string $queueName, string $id)
     {
         $this->client->pipeline(function ($client) use($queueName, $id) {
-            self::_updateCommandStatus($client, $queueName, $id, self::STATUS_COMPLETED);
-            $client->srem(":{$queueName}:queue_ids", [$id]);
+            self::_endCommand($client, $queueName, $id, self::STATUS_COMPLETED);
         });
     }
 
     public function setCommandFailed(string $queueName, string $id)
     {
         $this->client->pipeline(function ($client) use($queueName, $id) {
-            self::_updateCommandStatus($client, $queueName, $id, self::STATUS_FAILED);
-            $client->srem(":{$queueName}:queue_ids", [$id]);
+            self::_endCommand($client, $queueName, $id, self::STATUS_FAILED);
         });
     }
 
@@ -222,6 +220,14 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     private static function _reserveCommandId($client, string $queueName, string $id)
     {
         $client->sadd(":{$queueName}:queue_ids", [$id]);
+    }
+
+    private static function _endCommand($client, string $queueName, string $id, string $status)
+    {
+        self::_updateCommandStatus($client, $queueName, $id, $status);
+        self::_releaseReservedCommandId($client, $queueName, $id);
+        $client->srem(":{$queueName}:queue_ids", [$id]);
+        $client->lrem(":{$queueName}:consuming", 1, $id);
     }
 
     private static function _releaseReservedCommandId($client, string $queueName, string $id)
