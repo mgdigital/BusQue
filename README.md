@@ -73,3 +73,7 @@ Or run the Behat acceptance suite to test the implementation in your symfony app
 then:
 
     bin/behat
+
+Warnings
+--------
+I've not used this in production yet but I intend to soon! Good luck :)
