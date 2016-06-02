@@ -5,13 +5,12 @@ BusQue: Command Queue and Scheduler for PHP7
 
 I built BusQue because I found a lack of choice of simple message queues for medium-sized PHP applications.
 
-The name BusQue signifies Command Bus + Message Queue. It was designed to be used in conjunction with [Tactician](https://github.com/thephpleague/tactician) and [Redis](http://redis.io/), but is open to replacement with alternate adapters.
+The name BusQue signifies Command Bus + Message Queue. It was designed to be used in conjunction with [Tactician](https://github.com/thephpleague/tactician) and [Redis](http://redis.io/), along with a serializer such as PHP serialize(), [JMS Serializer](https://github.com/schmittjoh/serializer) or [MessagePack](http://msgpack.org/), but is open to replacement with alternate adapters.
 
 One key feature I found missing in other queues is the ability to assign a unique ID to a job, allowing the same job to be queued multiple times but have it only execute once after the last insertion.
 
 BusQue also allows scheduling of tasks.
 
-BusQue offers various options for command serialization, including PHP serialize(), JMS Serializer and MessagePack.
 
 [MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) provides integration with the Symfony framework.
 
