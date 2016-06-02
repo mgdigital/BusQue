@@ -9,6 +9,7 @@ use MGDigital\BusQue\ReceivedCommand;
 use MGDigital\BusQue\ReceivedScheduledCommand;
 use MGDigital\BusQue\SchedulerAdapterInterface;
 use Predis\Client;
+use Predis\Connection\ConnectionException;
 
 class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 {
@@ -37,7 +38,12 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     public function awaitCommand(string $queueName, int $timeout = null): ReceivedCommand
     {
         $stopwatchStart = time();
-        $id = $this->client->brpoplpush(":{$queueName}:queue", ":{$queueName}:consuming", $timeout ?? 0);
+        $this->client->ping();
+        try {
+            $id = $this->client->brpoplpush(":{$queueName}:queue", ":{$queueName}:consuming", $timeout ?? 0);
+        } catch (ConnectionException $e) {
+            $id = null;
+        }
         if (!$id) {
             if ($timeout !== null) {
                 $timeout = max(0, time() - $stopwatchStart - $timeout);
