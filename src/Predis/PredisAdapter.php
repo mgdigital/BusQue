@@ -168,7 +168,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         }
     }
 
-    public function awaitScheduledCommand(ClockInterface $clock, int $timeout = null, \DateInterval $expiry = null): ReceivedScheduledCommand
+    public function awaitScheduledCommands(ClockInterface $clock, int $n = null, int $timeout = null, \DateInterval $expiry = null): array
     {
         $stopwatchStart = time();
         while (true) {
@@ -181,9 +181,10 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
                 $start = $startTime->getTimestamp();
             }
             $result = $this->client->zrangebyscore(':schedule', $start, $currentTime->getTimestamp(), [
-                'limit' => [0, 1],
+                'limit' => [0, $n ?? 100],
                 'withscores' => true,
             ]);
+            $commands = [];
             foreach ($result as $json => $score) {
                 list($queueName, $id) = json_decode($json, true);
                 $dateTime = new \DateTime("@{$score}");
@@ -192,7 +193,10 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
                     self::_retrieveCommand($client, $queueName, $id);
                     self::_releaseReservedCommandId($client, $queueName, $id);
                 });
-                return new ReceivedScheduledCommand($queueName, $id, $serialized, $dateTime);
+                $commands[] = new ReceivedScheduledCommand($queueName, $id, $serialized, $dateTime);
+            }
+            if ($commands !== []) {
+                return $commands;
             }
             if ($timeout !== null) {
                 if ((time() - $stopwatchStart) >= $timeout) {

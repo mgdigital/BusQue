@@ -17,7 +17,7 @@ final class SchedulerWorkerSpec extends AbstractSpec
     {
         $dateTime = new \DateTime();
         $scheduledCommand = new ReceivedScheduledCommand('test_queue', 'test_id', 'serialized', $dateTime);
-        $this->schedulerAdapter->awaitScheduledCommand($this->clock, null)->willReturn($scheduledCommand);
+        $this->schedulerAdapter->awaitScheduledCommands($this->clock, 1, null)->willReturn([$scheduledCommand]);
         $this->queueAdapter->queueCommand('test_queue', 'test_id', 'serialized')->shouldBeCalled();
         $this->work(1);
     }

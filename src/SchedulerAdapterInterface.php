@@ -11,6 +11,9 @@ interface SchedulerAdapterInterface
 
     public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null);
 
-    public function awaitScheduledCommand(ClockInterface $clock, int $timeout = null): ReceivedScheduledCommand;
+    /**
+     * @return ReceivedScheduledCommand[]
+     */
+    public function awaitScheduledCommands(ClockInterface $clock, int $n = null, int $timeout = null): array;
 
 }

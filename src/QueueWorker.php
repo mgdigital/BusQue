@@ -21,8 +21,12 @@ class QueueWorker
         $serializer = $this->implementation->getCommandSerializer();
         $commandBus = $this->implementation->getCommandBusAdapter();
         $errorHandler = $this->implementation->getErrorHandler();
-        while ($n !== 0) {
-            $received = $queue->awaitCommand($queueName, $time);
+        while ($n === null || $n > 0) {
+            try {
+                $received = $queue->awaitCommand($queueName, $time);
+            } catch (TimeoutException $e) {
+                break;
+            }
             $command = $serializer->unserialize($received->getSerialized());
             try {
                 $commandBus->handle($command);
@@ -35,7 +39,7 @@ class QueueWorker
                 $n--;
             }
             if ($time !== null && (time() - $stopwatchStart >= $time)) {
-                throw new TimeoutException;
+                break;
             }
         }
     }

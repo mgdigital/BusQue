@@ -17,21 +17,23 @@ class SchedulerWorker
     public function work(int $n = null, int $time = null)
     {
         $stopwatchStart = time();
-        while ($n !== 0) {
+        while ($n === null || $n > 0) {
             try {
-                $received = $this->implementation->getSchedulerAdapter()
-                    ->awaitScheduledCommand($this->implementation->getClock(), $time);
+                $receivedCommands = $this->implementation->getSchedulerAdapter()
+                    ->awaitScheduledCommands($this->implementation->getClock(), $n, $time);
             } catch (TimeoutException $e) {
                 break;
             }
-            $this->implementation->getQueueAdapter()
-                ->queueCommand(
-                    $received->getQueueName(),
-                    $received->getId(),
-                    $received->getSerialized()
-                );
-            if ($n !== null) {
-                $n--;
+            foreach ($receivedCommands as $received) {
+                $this->implementation->getQueueAdapter()
+                    ->queueCommand(
+                        $received->getQueueName(),
+                        $received->getId(),
+                        $received->getSerialized()
+                    );
+                if ($n !== null) {
+                    $n--;
+                }
             }
             if ($time !== null && (time() - $stopwatchStart >= $time)) {
                 break;
