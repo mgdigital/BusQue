@@ -53,4 +53,20 @@ Tests
 
 Run the phpspec test suite:
 
-    vendor/bin/phpspec run
+    bin/phpspec run
+
+Or run the Behat acceptance suite to test the implementation in your symfony app:
+
+/behat.yml:
+
+    default:
+        suites:
+            busque:
+                type: symfony_bundle
+                bundle: MGDigitalBusQueBundle
+                contexts:
+                    - MGDigital\BusQueBundle\Features\Context\FeatureContext
+
+then:
+
+    bin/behat
