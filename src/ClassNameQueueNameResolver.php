@@ -7,7 +7,7 @@ class ClassNameQueueNameResolver implements QueueNameResolverInterface
 
     public function resolveQueueName($command): string
     {
-        return get_class($command);
+        return str_replace('\\', '_', get_class($command));
     }
 
 }
