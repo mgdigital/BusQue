@@ -16,3 +16,16 @@ BusQue was built with Redis in mind and currently has just one adapter for the P
 BusQue offers various options for command serialization, including PHP serialize(), JMS Serializer and MessagePack.
 
 [MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) provides integration with the Symfony framework.
+
+Example
+-------
+
+    <?php
+    
+    $command = new SendEmailCommand('joe@example.com', 'Hello Joe!');
+    $commandBus->handle(new BusQue\QueuedCommand($command));
+    
+    /* @var BusQue\Implementation $implementation */
+    $worker = new QueueWorker($implementation);
+    $worker->work('SendEmailCommand'); // Hello Joe!
+
