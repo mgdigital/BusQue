@@ -26,7 +26,7 @@ Example
     
     $commandBus->handle(new BusQue\QueuedCommand($command));
     
-    $implementation = new BusQue\Implementation(...$dependencies); // or $container->get('busque.implementation');
+    $implementation = new BusQue\Implementation(...$dependencies); // or with the Symfony bundle $container->get('busque.implementation');
     
     $worker = new BusQue\QueueWorker($implementation);
     $worker->work('SendEmailCommand'); // Hello Joe!
