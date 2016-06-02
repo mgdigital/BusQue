@@ -14,3 +14,5 @@ BusQue also allows scheduling of tasks.
 BusQue was built with Redis in mind and currently has just one adapter for the Predis client, but it is possible to build drivers for other storage backends.
 
 BusQue offers various options for command serialization, including PHP serialize(), JMS Serializer and MessagePack.
+
+[MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) provides integration with the Symfony framework.
