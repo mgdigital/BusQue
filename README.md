@@ -26,7 +26,6 @@ Example
     
     $commandBus->handle(new BusQue\QueuedCommand($command));
     
-    
     $implementation = new BusQue\Implementation(...$dependencies); // or $container->get('busque.implementation');
     
     $worker = new BusQue\QueueWorker($implementation);
