@@ -19,4 +19,4 @@ install:
   - export COMPOSER_ROOT_VERSION=dev-master
 
 script:
-   - bin/phpspec run --format=pretty
+   - vendor/bin/phpspec run --format=pretty
