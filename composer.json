@@ -8,7 +8,8 @@
     "require": {
         "php": ">=7.0",
         "league/tactician": "~1.0",
-        "predis/predis": "~1.0"
+        "predis/predis": "~1.0",
+        "psr/log": "~1.0"
     },
     "require-dev": {
         "phpspec/phpspec": "~2.5",
