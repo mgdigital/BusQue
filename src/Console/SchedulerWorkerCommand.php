@@ -4,6 +4,7 @@ namespace MGDigital\BusQue\Console;
 
 use MGDigital\BusQue\SchedulerWorker;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class SchedulerWorkerCommand extends AbstractCommand
@@ -13,8 +14,8 @@ class SchedulerWorkerCommand extends AbstractCommand
     {
         $this
             ->setName('busque:scheduler_worker')
-            ->addOption('number', 'n', null, 'The number of commands to receive.', -1)
-            ->addOption('time', 't', null, 'The time in seconds to run the worker', -1)
+            ->addOption('number', 'n', InputOption::VALUE_OPTIONAL, 'The number of commands to receive.', -1)
+            ->addOption('time', 't', InputOption::VALUE_OPTIONAL, 'The time in seconds to run the worker', -1)
         ;
     }
 
