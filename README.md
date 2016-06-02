@@ -3,7 +3,7 @@ BusQue: Command Queue and Scheduler for PHP7
 
 [![Build Status](https://travis-ci.org/mgdigital/BusQue.svg?branch=master)](https://travis-ci.org/mgdigital/BusQue)
 
-I built BusQue because I found a lack of choice of simple queueing solutions for medium-sized PHP applications.
+I built BusQue because I found a lack of choice of simple message queues for medium-sized PHP applications.
 
 It is built around a Command Bus architecture, hence the name BusQue (Coommand Bus + Message Queue).
 
