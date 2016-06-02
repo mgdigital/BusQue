@@ -15,6 +15,7 @@ class JMSCommandSerializer implements CommandSerializerInterface
     public function __construct(SerializerInterface $jmsSerializer, string $type, string $format = 'json')
     {
         $this->jmsSerializer = $jmsSerializer;
+        $this->type = $type;
         $this->format = $format;
     }
 
