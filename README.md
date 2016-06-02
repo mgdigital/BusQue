@@ -36,5 +36,21 @@ Example
     $schedulerWorker->work();
     
     // 1 minute later... Hello Joe!
-    
 
+Installation
+------------
+
+Install with composer:
+
+    composer require mgdigital/busque
+    
+Or get the Symfony bundle:
+
+    composer require mgdigital/busque-bundle
+
+Tests
+-----
+
+Run the phpspec test suite:
+
+    vendor/bin/phpspec run
