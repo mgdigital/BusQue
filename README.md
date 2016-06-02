@@ -13,6 +13,17 @@ BusQue also allows scheduling of tasks.
 
 [MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) provides integration with the [Symfony](http://symfony.com/) framework. If you want to use it outside of Symfony then you have to instantiate BusQue\Implementation with its dependencies.
 
+Installation
+------------
+
+Install with composer:
+
+    composer require mgdigital/busque
+    
+Or get the Symfony bundle:
+
+    composer require mgdigital/busque-bundle
+
 Example
 -------
 
@@ -37,17 +48,6 @@ Example
     // or in your Symfony app run app/console busque:scheduler_worker
     
     // 1 minute later... Hello Joe!
-
-Installation
-------------
-
-Install with composer:
-
-    composer require mgdigital/busque
-    
-Or get the Symfony bundle:
-
-    composer require mgdigital/busque-bundle
 
 Tests
 -----
