@@ -1,0 +1,24 @@
+{
+    "name": "mgdigital/busque",
+    "autoload": {
+        "psr-4": {
+            "MGDigital\\BusQue\\": "src"
+        }
+    },
+    "require": {
+        "php": ">=7.0",
+        "league/tactician": "~1.0",
+        "predis/predis": "~1.0"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "~2.5",
+        "phpunit/phpunit": "~4.3"
+    },
+    "suggest": {
+        "rybakit/msgpack": "For serialization to MessagePack format",
+        "jms/serializer": "For serialization to json or XML"
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}
