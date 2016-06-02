@@ -30,7 +30,7 @@ class SchedulerWorker
                 $n--;
             }
             if ($time !== null && (time() - $stopwatchStart >= $time)) {
-                throw new TimeoutException;
+                break;
             }
         }
     }
