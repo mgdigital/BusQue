@@ -15,7 +15,7 @@ before_install:
   - composer selfupdate
 
 install:
-  - composer install --prefer-source --no-interaction --dev
+  - composer install --prefer-source --no-interaction
 
 script:
-   - vendor/bin/phpspec run --format=pretty
+   - vendor/phpspec/phpspec/bin/phpspec run --config=phpspec.yml --format=pretty
