@@ -9,14 +9,13 @@ cache:
 matrix:
   include:
     - php: 7.0
-      env: DEPENDENCIES='dev'
   fast_finish: true
 
 before_install:
   - composer selfupdate
 
 install:
-  - export COMPOSER_ROOT_VERSION=dev-master
+  - composer install --prefer-source --no-interaction --dev
 
 script:
    - vendor/bin/phpspec run --format=pretty
