@@ -40,7 +40,7 @@ Example
     
     // or in your Symfony app run app/console busque:queue_worker SendEmailCommand
     
-    $commandBus->handle(new BusQue\ScheduledCommand($command), new \DateTime('+1 minute'));
+    $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute'));
     
     $schedulerWorker = new BusQue\SchedulerWorker($implementation);
     $schedulerWorker->work();
