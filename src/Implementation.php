@@ -2,8 +2,6 @@
 
 namespace MGDigital\BusQue;
 
-use MGDigital\BusQue\CommandSerializerInterface;
-
 class Implementation
 {
 
