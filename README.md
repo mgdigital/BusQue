@@ -53,7 +53,7 @@ Tests
 
 Run the phpspec test suite:
 
-    bin/phpspec run
+    bin/phpspec run -f pretty
 
 Or run the Behat acceptance suite to test the implementation in your symfony app:
 
