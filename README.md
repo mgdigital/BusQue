@@ -23,9 +23,18 @@ Example
     <?php
     
     $command = new SendEmailCommand('joe@example.com', 'Hello Joe!');
+    
     $commandBus->handle(new BusQue\QueuedCommand($command));
     
     /* @var BusQue\Implementation $implementation */
-    $worker = new QueueWorker($implementation);
+    $worker = new BusQue\QueueWorker($implementation);
     $worker->work('SendEmailCommand'); // Hello Joe!
+    
+    $commandBus->handle(new BusQue\ScheduledCommand($command), new \DateTime('+1 minute'));
+    
+    $schedulerWorker = new BusQue\SchedulerWorker($implementation);
+    $schedulerWorker->work();
+    
+    // 1 minute later... Hello Joe!
+    
 
