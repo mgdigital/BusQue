@@ -26,14 +26,20 @@ Example
     
     $commandBus->handle(new BusQue\QueuedCommand($command));
     
-    /* @var BusQue\Implementation $implementation */
+    
+    $implementation = new BusQue\Implementation(...$dependencies); // or $container->get('busque.implementation');
+    
     $worker = new BusQue\QueueWorker($implementation);
     $worker->work('SendEmailCommand'); // Hello Joe!
+    
+    // or in your Symfony app run app/console busque:queue_worker SendEmailCommand
     
     $commandBus->handle(new BusQue\ScheduledCommand($command), new \DateTime('+1 minute'));
     
     $schedulerWorker = new BusQue\SchedulerWorker($implementation);
     $schedulerWorker->work();
+    
+    // or in your Symfony app run app/console busque:scheduler_worker
     
     // 1 minute later... Hello Joe!
 
