@@ -76,5 +76,5 @@ then:
 
 Warnings
 --------
-- I've only just written this so there may be some gotchas that I haven't encountered yet. I intend to expand it with further capabilities as time permits, or please send a pull request!
+- I've only just written this so there may be some gotchas that I haven't encountered yet. I intend to improve its resilience and expand it with further capabilities as time permits, and also welcome pull requests!
 - I've not used this in production yet but I intend to soon! Good luck :)
