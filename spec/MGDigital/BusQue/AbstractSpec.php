@@ -43,7 +43,7 @@ abstract class AbstractSpec extends ObjectBehavior
         $queueNameResolver->resolveQueueName(Argument::any())->willReturn('test_queue');
 
         $commandSerializer->beADoubleOf(CommandSerializerInterface::class);
-        $commandSerializer->serialize(Argument::any())->willReturn('test_serialized');
+        $commandSerializer->serialize(Argument::any())->willReturn('serialized');
 
         $commandIdGenerator->beADoubleOf(CommandIdGeneratorInterface::class);
         $commandIdGenerator->generateId(Argument::any())->willReturn('test_generated_id');
