@@ -5,13 +5,11 @@ BusQue: Command Queue and Scheduler for PHP7
 
 I built BusQue because I found a lack of choice of simple message queues for medium-sized PHP applications.
 
-It is built around a Command Bus architecture, hence the name BusQue (Coommand Bus + Message Queue).
+It is built around a Command Bus architecture, hence the name BusQue (Coommand Bus + Message Queue). It was designed to be used in conjunction with [Redis]http://redis.io/ and [Tactician]https://github.com/thephpleague/tactician, but either could be replaced with alternate adapters.
 
 One key feature I found missing in other queues is the ability to assign a unique ID to a job, allowing the same job to be queued multiple times but have it only execute once after the last insertion.
 
 BusQue also allows scheduling of tasks.
-
-BusQue was built with Redis in mind and currently has just one adapter for the Predis client, but it is possible to build drivers for other storage backends.
 
 BusQue offers various options for command serialization, including PHP serialize(), JMS Serializer and MessagePack.
 
