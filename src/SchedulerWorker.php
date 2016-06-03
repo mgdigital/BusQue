@@ -2,8 +2,6 @@
 
 namespace MGDigital\BusQue;
 
-use MGDigital\BusQue\Exception\TimeoutException;
-
 class SchedulerWorker
 {
 
