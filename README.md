@@ -31,10 +31,12 @@ Examples
     
     use MGDigital\BusQue as BusQue;
     
+    
     // QUEUEING A COMMAND:
     
     $command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); 
-    // This is a command which you've configured your command bus to handle
+    // This is a command which you've configured your command bus to handle,
+    // See [Tactician](https://tactician.thephpleague.com/) for further details.
     
     $commandBus->handle(new BusQue\QueuedCommand($command));
     
