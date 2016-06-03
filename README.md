@@ -31,6 +31,9 @@ Examples
     
     use MGDigital\BusQue as BusQue;
     
+    $implementation = new BusQue\Implementation(...$dependencies); 
+    // or with the Symfony bundle, $implementation = $container->get('busque.implementation');
+    
     
     // QUEUING A COMMAND:
     
@@ -40,8 +43,8 @@ Examples
     
     $commandBus->handle(new BusQue\QueuedCommand($command));
     
-    $implementation = new BusQue\Implementation(...$dependencies); 
-    // or with the Symfony bundle, $implementation = $container->get('busque.implementation');
+    
+    // RUNNING A QUEUE WORKER:
     
     $worker = new BusQue\QueueWorker($implementation);
     $worker->work('SendEmailCommand'); // Hello Joe!
@@ -52,6 +55,13 @@ Examples
     // SCHEDULING A COMMAND:
     
     $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
+    
+    
+    // RUNNING THE SCHEDULER WORKER:
+    
+    // Only one scheduler worker is needed to manage all queues.
+    // The scheduler worker's only job is to queue commands which are due.
+    // A queue worker must also be running to handle these commands.
     
     $schedulerWorker = new BusQue\SchedulerWorker($implementation);
     $schedulerWorker->work();
