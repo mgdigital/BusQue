@@ -59,14 +59,14 @@ See [the Tactician website](https://tactician.thephpleague.com/) for further inf
 
 ### Queuing a command
 
+`SendEmailCommand` is a command which you've configured Tactician to handle. 
+
 ```php
 <?php
 
 $command = new SendEmailCommand('joe@example.com', 'Hello Joe!');
 $commandBus->handle(new BusQue\QueuedCommand($command));
 ```
-
-`SendEmailCommand` is a command which you've configured Tactician to handle. 
 
 
 ### Running a queue worker
