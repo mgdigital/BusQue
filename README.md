@@ -55,7 +55,7 @@ $worker->work('SendEmailCommand'); // Hello Joe!
 
 // Tip: If you want to see the commands being handled by the worker in the console,
 // configure some logging middleware in Tactician,
-// then run the queue_worker command with the --verbose option.
+// then run the busque:queue_worker command with the --verbose option.
 
 // SCHEDULING A COMMAND:
 
