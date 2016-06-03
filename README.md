@@ -57,18 +57,18 @@ Examples
     // 1 minute later... Hello Joe!
     
     
-    // COMMANDS NEEDING A UNIQUE ID:
+    // COMMANDS NEEDING AN IDENTIFIER:
     
     $productId = 123;
     $command = new SyncStockLevelsWithExternalApiCommand($productId);
     
-    // This command is queued every time the stock level of a product changes, but we give the command a unique ID:
-    $uniqueCommandId = 'stocksync' . $productId; // You could also use a custom ID generator to have unique IDs auto-generated for this type of command
+    // This command is queued every time the stock level of a product changes, but we give the command an ID:
+    $uniqueCommandId = 'stocksync' . $productId; // You could also configure a custom ID generator for this type of command 
     $commandBus->handle(new BusQue\QueuedCommand($command, $uniqueCommandId));
     
-    // What if the queue is busy and hasn't had time to process this command before the stock level changes a second time?
+    // What if the queue is busy and hasn't had time to process this command before the stock level of this product changes a second time?
     // The last thing we want is a duplicate of this message going into the queue, the stock level still only needs syncing once.
-    // Because we gave the command a unique ID it will only be executed once after its last insertion into the queue.
+    // Because we identified the command by the product ID, it will only be executed once after its last insertion into the queue.
     
 
 Tests
