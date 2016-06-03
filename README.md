@@ -9,8 +9,6 @@ The name BusQue signifies Command Bus + Message Queue. It was designed to be use
 
 One key feature I found missing in other queues is the ability to assign a unique ID to a job, allowing the same job to be queued multiple times but have it only execute once after the last insertion.
 
-BusQue also allows scheduling of tasks.
-
 [MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) provides integration with the [Symfony](http://symfony.com/) framework.
 
 
