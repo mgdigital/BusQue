@@ -31,7 +31,7 @@ Examples
     
     use MGDigital\BusQue as BusQue;
     
-    // Queueing a simple command:
+    // Queueing a command:
     
     $command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); // this is a command which you've configured your command bus to handle
     
