@@ -153,6 +153,26 @@ echo $implementation->getQueueAdapter()->getQueuedCount($queueName); // 0
 ```
 
 
+### Cancelling a command
+
+If you want to remove a command for any reason, you can also remove all trace of it with the following call:
+
+```php
+<?php
+
+$implementation->getQueueAdapter()->purgeCommand($queueName, $uniqueCommandId);
+```
+
+
+### Clearing a queue
+
+```
+<?php
+
+$implementation->getQueueAdaptor()->clearQueue($queueName);
+```
+
+
 Tests
 -----
 
