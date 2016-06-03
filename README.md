@@ -55,7 +55,7 @@ The `BusQue\CommandHandler` class also needs registering with Tactician (The Sym
 
 ### Running a queue worker:
 
-```
+```php
 <?php
 
 $worker = new BusQue\QueueWorker($implementation);
@@ -69,7 +69,7 @@ Or in your Symfony app run `app/console busque:queue_worker SendEmailCommand`
 
 ### Scheduling a command:
 
-```
+```php
 <?php
 
 $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
@@ -80,7 +80,7 @@ $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minu
 
 Only one scheduler worker is needed to manage all queues. The scheduler worker's only job is to queue commands which are due. A queue worker must also be running to handle these commands.
 
-```
+```php
 <?php
 
 $schedulerWorker = new BusQue\SchedulerWorker($implementation);
@@ -94,7 +94,7 @@ Or in your Symfony app run `app/console busque:scheduler_worker`
 
 This command is queued every time the stock level of a product changes, but we give the command an ID:
 
-```
+```php
 <?php
 
 $productId = 123;
@@ -118,7 +118,7 @@ Conversely, if you wanted to be able to issue the same command multiple times, a
 
 When we know the ID of a command and the name of its queue, we can also check its status:
 
-```
+```php
 <?php
 
 $queueName = $implementation->getQueueNameResolver()->resolveQueueName($command);
