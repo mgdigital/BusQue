@@ -5,6 +5,7 @@ namespace MGDigital\BusQue;
 interface QueueAdapterInterface
 {
 
+    const STATUS_SCHEDULED = 'scheduled';
     const STATUS_QUEUED = 'queued';
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_COMPLETED = 'completed';

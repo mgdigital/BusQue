@@ -133,6 +133,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             $this->client->pipeline(function ($client) use ($queueName, $id, $serialized, $dateTime) {
                 self::_storeCommand($client, $queueName, $id, $serialized);
                 self::_reserveCommandId($client, $queueName, $id);
+                self::_updateCommandStatus($client, $queueName, $id, self::STATUS_SCHEDULED);
                 $json = json_encode([$queueName, $id]);
                 $client->zadd(':schedule', [$json => $dateTime->getTimestamp()]);
             });
@@ -141,8 +142,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function cancelScheduledCommand(string $queueName, string $id)
     {
-        $json = json_encode([$queueName, $id]);
-        $this->client->zrem(':schedule', $json);
+        $this->purgeCommand($queueName, $id);
     }
 
     public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null)
