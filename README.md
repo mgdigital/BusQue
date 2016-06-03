@@ -52,6 +52,10 @@ $dependencies = [
 $implementation = new BusQue\Implementation(...$dependencies); 
 ```   
 
+The `BusQue\CommandHandler` class then needs to be registered with your command bus (Tactician). The Symfony bundle does this for you.
+
+See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
+
 
 ### Queuing a command
 
@@ -62,9 +66,7 @@ $command = new SendEmailCommand('joe@example.com', 'Hello Joe!');
 $commandBus->handle(new BusQue\QueuedCommand($command));
 ```
 
-`SendEmailCommand` is a command which you've configured your command bus to handle. See [Tactician](https://tactician.thephpleague.com/) for further information on using a command bus.
-
-The `BusQue\CommandHandler` class also needs registering with Tactician (The Symfony bundle does this for you).
+`SendEmailCommand` is a command which you've configured Tactician to handle. 
 
 
 ### Running a queue worker
