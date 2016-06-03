@@ -33,11 +33,13 @@ Examples
     
     // QUEUEING A COMMAND:
     
-    $command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); // this is a command which you've configured your command bus to handle
+    $command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); 
+    // This is a command which you've configured your command bus to handle
     
     $commandBus->handle(new BusQue\QueuedCommand($command));
     
-    $implementation = new BusQue\Implementation(...$dependencies); // or with the Symfony bundle $container->get('busque.implementation');
+    $implementation = new BusQue\Implementation(...$dependencies); 
+    // or with the Symfony bundle, $implementation = $container->get('busque.implementation');
     
     $worker = new BusQue\QueueWorker($implementation);
     $worker->work('SendEmailCommand'); // Hello Joe!
@@ -63,12 +65,18 @@ Examples
     $command = new SyncStockLevelsWithExternalApiCommand($productId);
     
     // This command is queued every time the stock level of a product changes, but we give the command an ID:
-    $uniqueCommandId = 'stocksync' . $productId; // You could also configure a custom ID generator for this type of command 
+    $uniqueCommandId = 'stocksync' . $productId; 
+    // You could also configure a custom ID generator for this type of command 
+    
     $commandBus->handle(new BusQue\QueuedCommand($command, $uniqueCommandId));
     
-    // What if the queue is busy and hasn't had time to process this command before the stock level of this product changes a second time?
-    // The last thing we want is a duplicate of this message going into the queue, the stock level still only needs syncing once.
-    // Because we identified the command by the product ID, it will only be executed once after its last insertion into the queue.
+    // What if the queue is busy and hasn't had time to process this command,
+    // before the stock level of this product changes a second time?
+    // The last thing we want is a duplicate of this message going into the queue, 
+    // the stock level still only needs syncing once.
+    
+    // Because we identified the command by the product ID, 
+    // it will only be executed once after its last insertion into the queue.
     
 
 Tests
