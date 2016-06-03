@@ -11,7 +11,7 @@ One key feature I found missing in other queues is the ability to assign a uniqu
 
 BusQue also allows scheduling of tasks.
 
-[MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) provides integration with the [Symfony](http://symfony.com/) framework. If you want to use it outside of Symfony then you have to instantiate BusQue\Implementation with its dependencies.
+[MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) provides integration with the [Symfony](http://symfony.com/) framework.
 
 
 Installation
