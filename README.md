@@ -90,7 +90,7 @@ Examples
     // the stock level still only needs syncing once.
     
     // Because we identified the command by the product ID, 
-    // it will only be allowed in the queue once at any one time.
+    // it will only be allowed in the queue once at any given time.
     
     
     // CHECKING A COMMAND'S PROGRESS:
