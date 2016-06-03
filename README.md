@@ -68,7 +68,8 @@ Examples
     
     // This command is queued every time the stock level of a product changes, but we give the command an ID:
     $uniqueCommandId = 'SyncStock' . $productId; 
-    // You could also configure a custom ID generator for this type of command 
+    // You could also configure a custom ID generator for this type of command,
+    // Then a consistent ID would be generated wherever this command is issued from in your app.
     
     $commandBus->handle(new BusQue\QueuedCommand($command, $uniqueCommandId));
     
