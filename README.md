@@ -39,7 +39,7 @@ $implementation = new BusQue\Implementation(...$dependencies);
 ```   
 
 
-### Queueing a command
+### Queuing a command
 
 ```php
 <?php
@@ -111,7 +111,7 @@ What if the queue is busy and hasn't had time to process this command, before th
 
 Because we identified the command by the product ID, it will only be allowed in the queue (or the scheduler) once at any given time.
 
-Conversely, if you wanted to be able to issue the same command multiple times, and be sure the queue worker will run each copy of the command, You would have to ensure each copy of the command has a unique ID.
+Conversely, if you wanted to be able to issue the same command multiple times, and be sure the queue worker will run each copy of the command, you would have to ensure each copy of the command has a unique ID.
 
 
 ### Checking a command's progress
