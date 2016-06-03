@@ -57,6 +57,7 @@ $worker->work('SendEmailCommand'); // Hello Joe!
 // configure some logging middleware in Tactician,
 // then run the busque:queue_worker command with the --verbose option.
 
+
 // SCHEDULING A COMMAND:
 
 $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
