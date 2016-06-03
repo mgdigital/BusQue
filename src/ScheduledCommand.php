@@ -13,6 +13,7 @@ final class ScheduledCommand
     {
         $this->command = $command;
         $this->dateTime = $dateTime;
+        $this->id = $id;
     }
 
     public function getCommand()
