@@ -90,7 +90,7 @@ Examples
     // the stock level still only needs syncing once.
     
     // Because we identified the command by the product ID, 
-    // it will only be allowed in the queue once at any given time.
+    // it will only be allowed in the queue (or the scheduler) once at any given time.
     
     // Conversely, if you wanted to be able to issue the same command multiple times, 
     // and be sure the queue worker will run each copy of the command,
