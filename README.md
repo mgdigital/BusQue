@@ -81,6 +81,9 @@ Examples
     // Because we identified the command by the product ID, 
     // it will only be executed once after its last insertion into the queue.
     
+    
+    // CHECKING A COMMAND'S PROGRESS:
+    
     // When we know the ID of a command and the name of its queue, we can also check its status:
     $queueName = $implementation->getQueueNameResolver()->resolveQueueName($command);
     echo $implementation->getQueueAdapter()->getCommandStatus($queueName, $uniqueCommandId); // completed
