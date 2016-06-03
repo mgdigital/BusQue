@@ -24,6 +24,7 @@ class SchedulerWorkerCommand extends AbstractCommand
         $number = $input->getOption('number');
         $time = $input->getOption('time');
         $worker = new SchedulerWorker($this->getImplementation());
+        $output->writeln('Awaiting scheduled commands...');
         $worker->work($number, $time);
     }
 

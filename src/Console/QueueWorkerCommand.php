@@ -27,6 +27,7 @@ class QueueWorkerCommand extends AbstractCommand
         $number = $input->getOption('number');
         $time = $input->getOption('time');
         $worker = new QueueWorker($this->getImplementation());
+        $output->writeln(sprintf('Working on queue %s...', $queueName));
         $worker->work($queueName, $number, $time);
     }
 
