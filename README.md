@@ -40,6 +40,8 @@ $implementation = new BusQue\Implementation(...$dependencies);
 $command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); 
 // This is a command which you've configured your command bus to handle,
 // See [Tactician](https://tactician.thephpleague.com/) for further details.
+// The BusQue\CommandHandler class also needs registering with Tactician.
+// (The Symfony bundle does this for you)
 
 $commandBus->handle(new BusQue\QueuedCommand($command));
 
