@@ -53,6 +53,9 @@ $worker->work('SendEmailCommand'); // Hello Joe!
 
 // or in your Symfony app run app/console busque:queue_worker SendEmailCommand
 
+// Tip: If you want to see the commands being handled by the worker in the console,
+// configure some logging middleware in Tactician,
+// then run the queue_worker command with the --verbose option.
 
 // SCHEDULING A COMMAND:
 
