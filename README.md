@@ -26,84 +26,84 @@ Or get the Symfony bundle:
 
 Examples
 --------
+```php
+<?php
 
-    <?php
-    
-    use MGDigital\BusQue as BusQue;
-    
-    $implementation = new BusQue\Implementation(...$dependencies); 
-    // or with the Symfony bundle, $implementation = $container->get('busque.implementation');
-    
-    
-    // QUEUING A COMMAND:
-    
-    $command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); 
-    // This is a command which you've configured your command bus to handle,
-    // See [Tactician](https://tactician.thephpleague.com/) for further details.
-    
-    $commandBus->handle(new BusQue\QueuedCommand($command));
-    
-    
-    // RUNNING A QUEUE WORKER:
-    
-    $worker = new BusQue\QueueWorker($implementation);
-    $worker->work('SendEmailCommand'); // Hello Joe!
-    
-    // or in your Symfony app run app/console busque:queue_worker SendEmailCommand
-    
-    
-    // SCHEDULING A COMMAND:
-    
-    $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
-    
-    
-    // RUNNING THE SCHEDULER WORKER:
-    
-    // Only one scheduler worker is needed to manage all queues.
-    // The scheduler worker's only job is to queue commands which are due.
-    // A queue worker must also be running to handle these commands.
-    
-    $schedulerWorker = new BusQue\SchedulerWorker($implementation);
-    $schedulerWorker->work();
-    
-    // or in your Symfony app run app/console busque:scheduler_worker
-    
-    // 1 minute later... Hello Joe!
-    
-    
-    // COMMANDS NEEDING AN IDENTIFIER:
-    
-    $productId = 123;
-    $command = new SyncStockLevelsWithExternalApiCommand($productId);
-    
-    // This command is queued every time the stock level of a product changes, but we give the command an ID:
-    $uniqueCommandId = 'SyncStock' . $productId; 
-    // When you don't specify a unique command ID, one will be generated automatically.
-    // You could also configure a custom ID generator for this type of command,
-    // Then a consistent ID would be generated wherever this command is issued from in your app.
-    
-    $commandBus->handle(new BusQue\QueuedCommand($command, $uniqueCommandId));
-    
-    // What if the queue is busy and hasn't had time to process this command,
-    // before the stock level of this product changes a second time?
-    // The last thing we want is a duplicate of this message going into the queue, 
-    // the stock level still only needs syncing once.
-    
-    // Because we identified the command by the product ID, 
-    // it will only be allowed in the queue (or the scheduler) once at any given time.
-    
-    // Conversely, if you wanted to be able to issue the same command multiple times, 
-    // and be sure the queue worker will run each copy of the command,
-    // You would have to ensure each copy of the command has a unique ID.
-     
-    
-    
-    // CHECKING A COMMAND'S PROGRESS:
-    
-    // When we know the ID of a command and the name of its queue, we can also check its status:
-    $queueName = $implementation->getQueueNameResolver()->resolveQueueName($command);
-    echo $implementation->getQueueAdapter()->getCommandStatus($queueName, $uniqueCommandId); // completed
-    
+use MGDigital\BusQue as BusQue;
+
+$implementation = new BusQue\Implementation(...$dependencies); 
+// or with the Symfony bundle, $implementation = $container->get('busque.implementation');
+
+
+// QUEUING A COMMAND:
+
+$command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); 
+// This is a command which you've configured your command bus to handle,
+// See [Tactician](https://tactician.thephpleague.com/) for further details.
+
+$commandBus->handle(new BusQue\QueuedCommand($command));
+
+
+// RUNNING A QUEUE WORKER:
+
+$worker = new BusQue\QueueWorker($implementation);
+$worker->work('SendEmailCommand'); // Hello Joe!
+
+// or in your Symfony app run app/console busque:queue_worker SendEmailCommand
+
+
+// SCHEDULING A COMMAND:
+
+$commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
+
+
+// RUNNING THE SCHEDULER WORKER:
+
+// Only one scheduler worker is needed to manage all queues.
+// The scheduler worker's only job is to queue commands which are due.
+// A queue worker must also be running to handle these commands.
+
+$schedulerWorker = new BusQue\SchedulerWorker($implementation);
+$schedulerWorker->work();
+
+// or in your Symfony app run app/console busque:scheduler_worker
+
+// 1 minute later... Hello Joe!
+
+
+// COMMANDS NEEDING AN IDENTIFIER:
+
+$productId = 123;
+$command = new SyncStockLevelsWithExternalApiCommand($productId);
+
+// This command is queued every time the stock level of a product changes, but we give the command an ID:
+$uniqueCommandId = 'SyncStock' . $productId; 
+// When you don't specify a unique command ID, one will be generated automatically.
+// You could also configure a custom ID generator for this type of command,
+// Then a consistent ID would be generated wherever this command is issued from in your app.
+
+$commandBus->handle(new BusQue\QueuedCommand($command, $uniqueCommandId));
+
+// What if the queue is busy and hasn't had time to process this command,
+// before the stock level of this product changes a second time?
+// The last thing we want is a duplicate of this message going into the queue, 
+// the stock level still only needs syncing once.
+
+// Because we identified the command by the product ID, 
+// it will only be allowed in the queue (or the scheduler) once at any given time.
+
+// Conversely, if you wanted to be able to issue the same command multiple times, 
+// and be sure the queue worker will run each copy of the command,
+// You would have to ensure each copy of the command has a unique ID.
+ 
+
+
+// CHECKING A COMMAND'S PROGRESS:
+
+// When we know the ID of a command and the name of its queue, we can also check its status:
+$queueName = $implementation->getQueueNameResolver()->resolveQueueName($command);
+echo $implementation->getQueueAdapter()->getCommandStatus($queueName, $uniqueCommandId); // completed
+```   
 
 Tests
 -----
@@ -116,13 +116,15 @@ Or run the Behat acceptance suite to test the implementation in your symfony app
 
 /behat.yml:
 
-    default:
-        suites:
-            busque:
-                type: symfony_bundle
-                bundle: MGDigitalBusQueBundle
-                contexts:
-                    - MGDigital\BusQueBundle\Features\Context\FeatureContext
+```yaml
+default:
+    suites:
+        busque:
+            type: symfony_bundle
+            bundle: MGDigitalBusQueBundle
+            contexts:
+                - MGDigital\BusQueBundle\Features\Context\FeatureContext
+```
 
 then:
 
