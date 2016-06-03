@@ -52,7 +52,7 @@ $dependencies = [
 $implementation = new BusQue\Implementation(...$dependencies); 
 ```   
 
-The `BusQue\CommandHandler` class then needs to be registered with your command bus (Tactician). The Symfony bundle does this for you.
+The `BusQue\CommandHandler` class then needs to be registered with your command bus (Tactician). The Symfony bundle does all this for you.
 
 See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
 
