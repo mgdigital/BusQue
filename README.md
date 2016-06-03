@@ -142,6 +142,17 @@ echo $implementation->getQueueAdapter()->getCommandStatus($queueName, $uniqueCom
 ```   
 
 
+### Checking the length of a queue
+
+We can also check the number of items in any queue:
+
+```php
+<?php
+
+echo $implementation->getQueueAdapter()->getQueuedCount($queueName); // 0
+```
+
+
 Tests
 -----
 
