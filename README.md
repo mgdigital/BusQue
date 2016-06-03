@@ -31,6 +31,8 @@ Examples
     
     use MGDigital\BusQue as BusQue;
     
+    // Queueing a simple command:
+    
     $command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); // this is a command which you've configured your command bus to handle
     
     $commandBus->handle(new BusQue\QueuedCommand($command));
@@ -43,6 +45,8 @@ Examples
     // or in your Symfony app run app/console busque:queue_worker SendEmailCommand
     
     
+    // Scheduling a command
+    
     $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
     
     $schedulerWorker = new BusQue\SchedulerWorker($implementation);
@@ -53,14 +57,14 @@ Examples
     // 1 minute later... Hello Joe!
     
     
-    // Or consider the following example:
+    // Commands needing a unique ID:
     
     $productId = 123;
     $command = new SyncStockLevelsWithExternalApiCommand($productId);
     
     // This command is queued every time the stock level of a product changes, but we give the command a unique ID:
-    $uniqueId = 'stocksync' . $productId;
-    $this->commandBus->handle(new QueuedCommand($command, $uniqueId));
+    $uniqueCommandId = 'stocksync' . $productId; // You could also use a custom ID generator to have unique IDs auto-generated for this type of command
+    $this->commandBus->handle(new QueuedCommand($command, $uniqueCommandId));
     
     // What if the queue is busy and hasn't had time to process this command before the stock level changes a second time?
     // The last thing we want is a duplicate of this message going into the queue, the stock level still only needs syncing once.
