@@ -67,7 +67,7 @@ Examples
     $command = new SyncStockLevelsWithExternalApiCommand($productId);
     
     // This command is queued every time the stock level of a product changes, but we give the command an ID:
-    $uniqueCommandId = 'stocksync' . $productId; 
+    $uniqueCommandId = 'SyncStock' . $productId; 
     // You could also configure a custom ID generator for this type of command 
     
     $commandBus->handle(new BusQue\QueuedCommand($command, $uniqueCommandId));
@@ -79,6 +79,10 @@ Examples
     
     // Because we identified the command by the product ID, 
     // it will only be executed once after its last insertion into the queue.
+    
+    // When we know the ID of a command and the name of its queue, we can also check its status:
+    $queueName = 'SyncStock'; // (the queue name resolver decides which queue each command should go into)
+    echo $implementation->getQueueAdapter()->getCommandStatus($queueName, $uniqueCommandId); //completed
     
 
 Tests
