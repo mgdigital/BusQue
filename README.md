@@ -94,7 +94,7 @@ $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minu
 
 ### Running the scheduler worker
 
-Only one scheduler worker is needed to manage all queues. The scheduler worker's only job is to queue commands which are due. A queue worker must also be running to handle these commands.
+Only one scheduler worker is needed to manage the schedule for all queues. The scheduler worker's only job is to queue commands which are due. A queue worker must also be running to handle these commands.
 
 ```php
 <?php
