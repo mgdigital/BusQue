@@ -1,5 +1,5 @@
-BusQue: Command Queue and Scheduler for PHP7
-============================================
+BusQue: Redis-based Command Queue and Scheduler for PHP7
+========================================================
 
 [![Build Status](https://travis-ci.org/mgdigital/BusQue.svg?branch=master)](https://travis-ci.org/mgdigital/BusQue)
 
