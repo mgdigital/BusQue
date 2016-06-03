@@ -44,7 +44,7 @@ $dependencies = [
     new BusQue\CommandIdGeneratorInterface,
     new BusQue\QueueAdapterInterface,
     new BusQue\SchedulerAdapterInterface,
-    new BusQue\BusQue\ClockInterface,
+    new BusQue\ClockInterface,
     new BusQue\CommandBusAdapterInterface,
     new BusQue\ErrorHandlerInterface
 ];
