@@ -60,7 +60,6 @@ The `BusQue\CommandHandler` class also needs registering with Tactician (The Sym
 
 $worker = new BusQue\QueueWorker($implementation);
 $worker->work('SendEmailCommand'); // Hello Joe!
-
 ```
 
 Or in your Symfony app run `app/console busque:queue_worker SendEmailCommand`
