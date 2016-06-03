@@ -24,8 +24,8 @@ Or get the Symfony bundle:
 
     composer require mgdigital/busque-bundle
 
-Example
--------
+Examples
+--------
 
     <?php
     
@@ -42,6 +42,7 @@ Example
     
     // or in your Symfony app run app/console busque:queue_worker SendEmailCommand
     
+    
     $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
     
     $schedulerWorker = new BusQue\SchedulerWorker($implementation);
@@ -50,6 +51,21 @@ Example
     // or in your Symfony app run app/console busque:scheduler_worker
     
     // 1 minute later... Hello Joe!
+    
+    
+    // Or consider the following example:
+    
+    $productId = 123;
+    $command = new SyncStockLevelsWithExternalApiCommand($productId);
+    
+    // This command is queued every time the stock level of a product changes, but we give the command a unique ID:
+    $uniqueId = 'stocksync' . $productId;
+    $this->commandBus->handle(new QueuedCommand($command, $uniqueId));
+    
+    // What if the queue is busy and hasn't had time to process this command before the stock level changes a second time?
+    // The last thing we want is a duplicate of this message going into the queue, the stock level still only needs syncing once.
+    // Because we gave the command a unique ID it will only be executed once after its last insertion into the queue.
+    
 
 Tests
 -----
