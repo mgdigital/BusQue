@@ -39,7 +39,7 @@ $implementation = new BusQue\Implementation(...$dependencies);
 ```   
 
 
-### Queueing a command:
+### Queueing a command
 
 ```php
 <?php
@@ -53,7 +53,7 @@ $commandBus->handle(new BusQue\QueuedCommand($command));
 The `BusQue\CommandHandler` class also needs registering with Tactician (The Symfony bundle does this for you).
 
 
-### Running a queue worker:
+### Running a queue worker
 
 ```php
 <?php
@@ -67,7 +67,7 @@ Or in your Symfony app run `app/console busque:queue_worker SendEmailCommand`
 *Tip:* If you want to see the commands being handled by the worker in the console, configure some logging middleware in Tactician, then run the `busque:queue_worker` command with the `--verbose` option.
 
 
-### Scheduling a command:
+### Scheduling a command
 
 ```php
 <?php
@@ -76,7 +76,7 @@ $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minu
 ```
 
 
-### Running the scheduler worker:
+### Running the scheduler worker
 
 Only one scheduler worker is needed to manage all queues. The scheduler worker's only job is to queue commands which are due. A queue worker must also be running to handle these commands.
 
@@ -90,7 +90,7 @@ $schedulerWorker->work(); // 1 minute later... Hello Joe!
 Or in your Symfony app run `app/console busque:scheduler_worker`
 
 
-### Commands needing an identifier:
+### Commands needing an identifier
 
 This command is queued every time the stock level of a product changes, but we give the command an ID:
 
@@ -114,7 +114,7 @@ Because we identified the command by the product ID, it will only be allowed in 
 Conversely, if you wanted to be able to issue the same command multiple times, and be sure the queue worker will run each copy of the command, You would have to ensure each copy of the command has a unique ID.
 
 
-### Checking a command's progress:
+### Checking a command's progress
 
 When we know the ID of a command and the name of its queue, we can also check its status:
 
