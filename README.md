@@ -13,6 +13,7 @@ BusQue also allows scheduling of tasks.
 
 [MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) provides integration with the [Symfony](http://symfony.com/) framework. If you want to use it outside of Symfony then you have to instantiate BusQue\Implementation with its dependencies.
 
+
 Installation
 ------------
 
@@ -24,8 +25,10 @@ Or get the Symfony bundle:
 
     composer require mgdigital/busque-bundle
 
+
 Examples
 --------
+
 ```php
 <?php
 
@@ -33,83 +36,96 @@ use MGDigital\BusQue as BusQue;
 
 $implementation = new BusQue\Implementation(...$dependencies); 
 // or with the Symfony bundle, $implementation = $container->get('busque.implementation');
+```   
 
 
-// QUEUING A COMMAND:
+### Queueing a command:
 
-$command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); 
-// This is a command which you've configured your command bus to handle,
-// See [Tactician](https://tactician.thephpleague.com/) for further details.
-// The BusQue\CommandHandler class also needs registering with Tactician.
-// (The Symfony bundle does this for you)
+```php
+<?php
 
+$command = new SendEmailCommand('joe@example.com', 'Hello Joe!');
 $commandBus->handle(new BusQue\QueuedCommand($command));
+```
+
+`SendEmailCommand` is a command which you've configured your command bus to handle. See [Tactician](https://tactician.thephpleague.com/) for further information on using a command bus.
+
+The `BusQue\CommandHandler` class also needs registering with Tactician (The Symfony bundle does this for you).
 
 
-// RUNNING A QUEUE WORKER:
+### Running a queue worker:
+
+```
+<?php
 
 $worker = new BusQue\QueueWorker($implementation);
 $worker->work('SendEmailCommand'); // Hello Joe!
 
-// or in your Symfony app run app/console busque:queue_worker SendEmailCommand
+```
 
-// Tip: If you want to see the commands being handled by the worker in the console,
-// configure some logging middleware in Tactician,
-// then run the busque:queue_worker command with the --verbose option.
+Or in your Symfony app run `app/console busque:queue_worker SendEmailCommand`
+
+*Tip:* If you want to see the commands being handled by the worker in the console, configure some logging middleware in Tactician, then run the `busque:queue_worker` command with the `--verbose` option.
 
 
-// SCHEDULING A COMMAND:
+### Scheduling a command:
+
+```
+<?php
 
 $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
+```
 
 
-// RUNNING THE SCHEDULER WORKER:
+### Running the scheduler worker:
 
-// Only one scheduler worker is needed to manage all queues.
-// The scheduler worker's only job is to queue commands which are due.
-// A queue worker must also be running to handle these commands.
+Only one scheduler worker is needed to manage all queues. The scheduler worker's only job is to queue commands which are due. A queue worker must also be running to handle these commands.
+
+```
+<?php
 
 $schedulerWorker = new BusQue\SchedulerWorker($implementation);
-$schedulerWorker->work();
+$schedulerWorker->work(); // 1 minute later... Hello Joe!
+```
 
-// or in your Symfony app run app/console busque:scheduler_worker
-
-// 1 minute later... Hello Joe!
+Or in your Symfony app run `app/console busque:scheduler_worker`
 
 
-// COMMANDS NEEDING AN IDENTIFIER:
+### Commands needing an identifier:
+
+This command is queued every time the stock level of a product changes, but we give the command an ID:
+
+```
+<?php
 
 $productId = 123;
 $command = new SyncStockLevelsWithExternalApiCommand($productId);
 
-// This command is queued every time the stock level of a product changes, but we give the command an ID:
 $uniqueCommandId = 'SyncStock' . $productId; 
-// When you don't specify a unique command ID, one will be generated automatically.
-// You could also configure a custom ID generator for this type of command,
-// Then a consistent ID would be generated wherever this command is issued from in your app.
 
 $commandBus->handle(new BusQue\QueuedCommand($command, $uniqueCommandId));
+```
 
-// What if the queue is busy and hasn't had time to process this command,
-// before the stock level of this product changes a second time?
-// The last thing we want is a duplicate of this message going into the queue, 
-// the stock level still only needs syncing once.
+When you don't specify a unique command ID, one will be generated automatically. You could also configure a custom ID generator for this type of command, Then a consistent ID would be generated wherever this command is issued from in your app.
 
-// Because we identified the command by the product ID, 
-// it will only be allowed in the queue (or the scheduler) once at any given time.
+What if the queue is busy and hasn't had time to process this command, before the stock level of this product changes a second time? The last thing we want is a duplicate of this message going into the queue, the stock level still only needs syncing once.
 
-// Conversely, if you wanted to be able to issue the same command multiple times, 
-// and be sure the queue worker will run each copy of the command,
-// You would have to ensure each copy of the command has a unique ID.
- 
+Because we identified the command by the product ID, it will only be allowed in the queue (or the scheduler) once at any given time.
+
+Conversely, if you wanted to be able to issue the same command multiple times, and be sure the queue worker will run each copy of the command, You would have to ensure each copy of the command has a unique ID.
 
 
-// CHECKING A COMMAND'S PROGRESS:
+### Checking a command's progress:
 
-// When we know the ID of a command and the name of its queue, we can also check its status:
+When we know the ID of a command and the name of its queue, we can also check its status:
+
+```
+<?php
+
 $queueName = $implementation->getQueueNameResolver()->resolveQueueName($command);
 echo $implementation->getQueueAdapter()->getCommandStatus($queueName, $uniqueCommandId); // completed
 ```   
+
 
 Tests
 -----
@@ -135,6 +151,7 @@ default:
 then:
 
     bin/behat
+
 
 Warnings
 --------
