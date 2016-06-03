@@ -31,7 +31,7 @@ Examples
     
     use MGDigital\BusQue as BusQue;
     
-    // Queueing a command:
+    // QUEUEING A COMMAND:
     
     $command = new SendEmailCommand('joe@example.com', 'Hello Joe!'); // this is a command which you've configured your command bus to handle
     
@@ -45,7 +45,7 @@ Examples
     // or in your Symfony app run app/console busque:queue_worker SendEmailCommand
     
     
-    // Scheduling a command
+    // SCHEDULING A COMMAND:
     
     $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
     
@@ -57,7 +57,7 @@ Examples
     // 1 minute later... Hello Joe!
     
     
-    // Commands needing a unique ID:
+    // COMMANDS NEEDING A UNIQUE ID:
     
     $productId = 123;
     $command = new SyncStockLevelsWithExternalApiCommand($productId);
