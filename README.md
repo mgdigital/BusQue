@@ -59,7 +59,7 @@ See [the Tactician website](https://tactician.thephpleague.com/) for further inf
 
 ### Queuing a command
 
-`SendEmailCommand` is a command which you've configured Tactician to handle. 
+`SendEmailCommand` is a command which you've configured Tactician to handle:
 
 ```php
 <?php
