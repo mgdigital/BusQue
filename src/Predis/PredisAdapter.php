@@ -200,7 +200,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             }
             if ($timeout !== null) {
                 if ((time() - $stopwatchStart) >= $timeout) {
-                    throw new TimeoutException;
+                    return [];
                 }
                 $sleepTime = min($timeout, $this->schedulerDelay);
             } else {

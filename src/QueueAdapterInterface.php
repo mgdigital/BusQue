@@ -2,6 +2,8 @@
 
 namespace MGDigital\BusQue;
 
+use MGDigital\BusQue\Exception\TimeoutException;
+
 interface QueueAdapterInterface
 {
 
@@ -33,6 +35,7 @@ interface QueueAdapterInterface
     /**
      * @param string $queueName
      * @return ReceivedCommand
+     * @throws TimeoutException
      */
     public function awaitCommand(string $queueName, int $timeout = null): ReceivedCommand;
 

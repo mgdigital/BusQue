@@ -2,6 +2,8 @@
 
 namespace MGDigital\BusQue;
 
+use MGDigital\BusQue\Exception\TimeoutException;
+
 interface SchedulerAdapterInterface
 {
 
@@ -12,6 +14,9 @@ interface SchedulerAdapterInterface
     public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null);
 
     /**
+     * @param ClockInterface $clock
+     * @param int $n The maximum number of scheduled commands to return.
+     * @param int $timeout If the timeout is reached before a scheduled command is encountered then an empty array should be returned.
      * @return ReceivedScheduledCommand[]
      */
     public function awaitScheduledCommands(ClockInterface $clock, int $n = null, int $timeout = null): array;
