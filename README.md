@@ -82,7 +82,7 @@ Examples
     // it will only be executed once after its last insertion into the queue.
     
     // When we know the ID of a command and the name of its queue, we can also check its status:
-    $queueName = 'SyncStock'; // (the queue name resolver decides which queue each command should go into)
+    $queueName = $implementation->getQueueNameResolver()->resolveQueueName($command);
     echo $implementation->getQueueAdapter()->getCommandStatus($queueName, $uniqueCommandId); // completed
     
 
