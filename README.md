@@ -29,13 +29,27 @@ Or get the Symfony bundle:
 Examples
 --------
 
+To use BusQue you first need to instantiate an instance of `BusQue\Implementation` with its dependencies, or with the Symfony bundle you can get the `busque.implementation` service from the container.
+
+Adapters for the following interfaces are available in this repository or you can write your own:
+ 
 ```php
 <?php
 
 use MGDigital\BusQue as BusQue;
 
+$dependencies = [
+    new BusQue\QueueNameResolverInterface,
+    new BusQue\CommandSerializerInterface,
+    new BusQue\CommandIdGeneratorInterface,
+    new BusQue\QueueAdapterInterface,
+    new BusQue\SchedulerAdapterInterface,
+    new BusQue\BusQue\ClockInterface,
+    new BusQue\CommandBusAdapterInterface,
+    new BusQue\ErrorHandlerInterface
+];
+
 $implementation = new BusQue\Implementation(...$dependencies); 
-// or with the Symfony bundle, $implementation = $container->get('busque.implementation');
 ```   
 
 
