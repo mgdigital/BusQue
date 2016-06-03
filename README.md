@@ -26,8 +26,8 @@ Or get the Symfony bundle:
     composer require mgdigital/busque-bundle
 
 
-Examples
---------
+Usage
+-----
 
 To use BusQue you first need to instantiate an instance of `BusQue\Implementation` with its dependencies, or with the Symfony bundle you can get the `busque.implementation` service from the container.
 
