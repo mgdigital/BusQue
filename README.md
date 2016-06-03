@@ -153,7 +153,7 @@ Or run the Behat acceptance suite to test the implementation in your symfony app
 
 The [busque.feature](https://raw.githubusercontent.com/mgdigital/BusQueBundle/master/Features/busque.feature) file describes BusQue's expected behaviour.
 
-/behat.yml:
+`/behat.yml`:
 
 ```yaml
 default:
