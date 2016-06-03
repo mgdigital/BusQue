@@ -80,6 +80,8 @@ $worker->work('SendEmailCommand'); // Hello Joe!
 
 Or in your Symfony app run `app/console busque:queue_worker SendEmailCommand`
 
+You need to run at least one worker instance for each of your queues. Thanks to Redis' [brpoplpush](http://redis.io/commands/brpoplpush) method, multiple workers can run on the same queue without concurrency issues.
+
 *Tip:* If you want to see the commands being handled by the worker in the console, configure some logging middleware in Tactician, then run the `busque:queue_worker` command with the `--verbose` option.
 
 
