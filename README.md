@@ -164,7 +164,7 @@ echo $busque->getQueuedCount($queueName); // 0
 
 ### Cancelling a command
 
-If you want to remove a command for any reason, you can remove all trace of it with the following call:
+If you want to cancel a command for any reason, you can remove all trace of it with the following call:
 
 ```php
 <?php
