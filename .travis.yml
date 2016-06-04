@@ -11,6 +11,9 @@ matrix:
     - php: 7.0
   fast_finish: true
 
+services:
+  - redis-server
+
 before_install:
   - composer selfupdate
 
@@ -20,3 +23,4 @@ install:
 script:
   - vendor/squizlabs/php_codesniffer/scripts/phpcs --standard=PSR2 src
   - vendor/phpspec/phpspec/bin/phpspec run --config=phpspec.yml --format=pretty
+  - vendor/behat/behat/bin/behat
