@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue;
 
-class CommandHandler
+final class CommandHandler
 {
 
     private $implementation;

@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue;
 
-class Implementation
+final class Implementation
 {
 
     private $queueNameResolver;
