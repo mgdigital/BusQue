@@ -162,6 +162,17 @@ echo $busque->getQueuedCount($queueName); // 0
 ```
 
 
+### Listing queues
+
+Queues are created automatically if they don't exist, using whichever queue name is returned from the `QueueNameResolverInterface` adapter. A worker can work on a queue which doesn't exist yet. You need to make sure that if a new queue name is generated, there is a worker to receive the commands in that queue.
+
+```php
+<?php
+
+$queues = $busque->listQueues(); // ['SendEmailCommand', 'SyncStockCommand']
+```
+
+
 ### Cancelling a command
 
 If you want to cancel a command for any reason, you can remove all trace of it with the following call:

@@ -81,4 +81,12 @@ class BusQueSpec extends AbstractSpec
         $this->emptyQueue('test_queue');
     }
 
+    public function it_can_list_the_queues()
+    {
+        $this->queueAdapter->getQueueNames()->willReturn(['test_queue']);
+        $this->queueAdapter->getQueueNames()->shouldBeCalled();
+        $this->listQueues()->shouldReturn(['test_queue']);
+        $this->listQueues();
+    }
+
 }

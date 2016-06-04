@@ -62,6 +62,11 @@ class BusQue
         $this->implementation->getQueueAdapter()->emptyQueue($queueName);
     }
 
+    public function listQueues(): array
+    {
+        return $this->implementation->getQueueAdapter()->getQueueNames();
+    }
+
     public function workQueue(string $queueName, int $n = null, int $time = null)
     {
         (new QueueWorker($this->implementation))->work($queueName, $n, $time);
