@@ -63,6 +63,7 @@ If you're using BusQue standalone, a basic configuration could look something li
 ```php
 <?php
 
+// This is where the magic happens:
 $predisAdapter = new BusQue\Predis\PredisAdapter(new Predis\Client());
 
 $implementation = new BusQue\Implementation(
