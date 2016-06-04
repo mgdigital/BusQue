@@ -68,6 +68,10 @@ If you're using the Symfony bundle, then all of the above is done for you, and y
 
 $command = new SendEmailCommand('joe@example.com', 'Hello Joe!');
 $commandBus->handle(new BusQue\QueuedCommand($command));
+
+// or
+
+$busque->queueCommand($command);
 ```
 
 
@@ -92,6 +96,10 @@ You need to run at least one worker instance for each of your queues, using some
 <?php
 
 $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
+
+// or
+
+$busque->scheduleCommand($command, new \DateTime('+1 minute'));
 ```
 
 
