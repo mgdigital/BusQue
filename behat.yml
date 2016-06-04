@@ -1,0 +1,5 @@
+default:
+    suites:
+        busque:
+            contexts:
+                - MGDigital\BusQue\Features\Context\FeatureContext

@@ -189,23 +189,9 @@ Run the phpspec test suite:
 
     bin/phpspec run -f pretty
 
-Or run the Behat acceptance suite to test the implementation in your symfony app.
+And run the Behat acceptance suite:
 
-The [busque.feature](https://raw.githubusercontent.com/mgdigital/BusQueBundle/master/Features/busque.feature) file describes BusQue's expected behaviour.
-
-`/behat.yml`:
-
-```yaml
-default:
-    suites:
-        busque:
-            type: symfony_bundle
-            bundle: MGDigitalBusQueBundle
-            contexts:
-                - MGDigital\BusQueBundle\Features\Context\FeatureContext
-```
-
-then:
+*Warning: this will attempt to write to your localhost Redis instance by default.* You may prefer to configure an alternate test client by replacing `features/Context/FeatureContext`.
 
     bin/behat
 

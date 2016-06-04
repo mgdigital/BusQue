@@ -2,7 +2,8 @@
     "name": "mgdigital/busque",
     "autoload": {
         "psr-4": {
-            "MGDigital\\BusQue\\": "src"
+            "MGDigital\\BusQue\\": "src",
+            "MGDigital\\BusQue\\Features\\": "features"
         }
     },
     "require": {
@@ -12,6 +13,7 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "behat/behat": "~3.0",
         "phpspec/phpspec": "~2.5",
         "phpunit/phpunit": "~4.3",
         "squizlabs/php_codesniffer": "~2.6"
