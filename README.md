@@ -52,7 +52,7 @@ $implementation = new BusQue\Implementation(
 $busque = new BusQue\BusQue($implementation);
 ```
 
-The `BusQue\CommandHandler` class then needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
+The `BusQue\CommandHandler` class also needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
 
 If you're using the Symfony bundle, then all of the above is done for you, and you can just get the `busque` service from the container.
 
