@@ -38,7 +38,7 @@ Adapters for the following interfaces are available in this repository or you ca
 
 use MGDigital\BusQue as BusQue;
 
-$dependencies = [
+$implementation = new BusQue\Implementation(
     new BusQue\QueueNameResolverInterface,
     new BusQue\CommandSerializerInterface,
     new BusQue\CommandIdGeneratorInterface,
@@ -47,9 +47,7 @@ $dependencies = [
     new BusQue\ClockInterface,
     new BusQue\CommandBusAdapterInterface,
     new BusQue\ErrorHandlerInterface
-];
-
-$implementation = new BusQue\Implementation(...$dependencies);
+);
 
 $busque = new BusQue\BusQue($implementation);
 ```
