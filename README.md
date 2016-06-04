@@ -56,6 +56,26 @@ The `BusQue\CommandHandler` class also needs to be registered with your command 
 
 If you're using the Symfony bundle, then all of the above is done for you, and you can just get the `busque` service from the container.
 
+If you're using BusQue standalone, a basic configuration could look something like this:
+
+```php
+<?php
+
+$predisAdapter = new PredisAdapter(new Predis\Client());
+
+$implementation = new BusQue\Implementation(
+    new BusQue\ClassNameQueueNameResolver(),
+    new BusQue\Serializer\PHPCommandSerializer(),
+    new BusQue\IdGenerator\ObjectHashIdGenerator(),
+    $predisAdapter,
+    $predisadapter,
+    new BusQue\SystemClock(),
+    new BusQue\Tactician\CommandBusAdapter($commandBus),
+    new BusQue\Logging\LoggingErrorHandler(new Psr\Log\NullLogger())
+);
+
+$busque = new BusQue\BusQue($implementation);
+```
 
 ### Queuing a command
 
