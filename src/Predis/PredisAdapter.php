@@ -124,6 +124,8 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             $client->hdel(":{$queueName}:command_status", [$id]);
             self::cReleaseReservedCommandId($client, $queueName, $id);
             $json = json_encode([$queueName, $id]);
+            $client->lrem(":{$queueName}:queue", 1, $id);
+            $client->lrem(":{$queueName}:consuming", 1, $id);
             $client->zrem(':schedule', $json);
         });
     }
