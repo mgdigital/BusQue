@@ -61,7 +61,7 @@ If you're using BusQue standalone, a basic configuration could look something li
 ```php
 <?php
 
-$predisAdapter = new PredisAdapter(new Predis\Client());
+$predisAdapter = new BusQue\Predis\PredisAdapter(new Predis\Client());
 
 $implementation = new BusQue\Implementation(
     new BusQue\ClassNameQueueNameResolver(),
