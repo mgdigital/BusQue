@@ -3,7 +3,7 @@ BusQue
 
 [![Build Status](https://travis-ci.org/mgdigital/BusQue.svg?branch=master)](https://travis-ci.org/mgdigital/BusQue)
 
-### A command queue and scheduler for PHP7, built on Redis
+### A flexible, modern command queue and scheduler for PHP7, built on Redis
 
 I built BusQue because I found a lack of choice of simple message queues for medium-sized PHP applications.
 
