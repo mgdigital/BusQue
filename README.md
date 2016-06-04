@@ -66,13 +66,20 @@ If you're using BusQue standalone, a basic configuration could look something li
 $predisAdapter = new BusQue\Predis\PredisAdapter(new Predis\Client());
 
 $implementation = new BusQue\Implementation(
+    // Results in queues named by the command classname, backslashes replaced with underscores:
     new BusQue\ClassNameQueueNameResolver(),
+    // You might want to replace this with a more advanced serializer: 
     new BusQue\Serializer\PHPCommandSerializer(),
+    // Commands without an explicit ID will have spl_object_hash() performed to generate the ID:
     new BusQue\IdGenerator\ObjectHashIdGenerator(),
+    // The Predis adapter is used as both the queue and scheduler:
     $predisAdapter,
     $predisadapter,
+    // Always returns the current time:
     new BusQue\SystemClock(),
+    // Inject your command bus here:
     new BusQue\Tactician\CommandBusAdapter($commandBus),
+    // Log any errors or create an alternate error handler:
     new BusQue\Logging\LoggingErrorHandler(new Psr\Log\NullLogger())
 );
 
