@@ -32,14 +32,14 @@ class BusQue
         return $this->implementation->getCommandIdGenerator()->generateId($command);
     }
 
-    public function queueCommand($command)
+    public function queueCommand($command, string $commandId = null)
     {
-        $this->implementation->getCommandBusAdapter()->handle(new QueuedCommand($command));
+        $this->implementation->getCommandBusAdapter()->handle(new QueuedCommand($command, $commandId));
     }
 
-    public function scheduleCommand($command, \DateTime $dateTime)
+    public function scheduleCommand($command, \DateTime $dateTime, string $commandId = null)
     {
-        $this->implementation->getCommandBusAdapter()->handle(new ScheduledCommand($command, $dateTime));
+        $this->implementation->getCommandBusAdapter()->handle(new ScheduledCommand($command, $dateTime, $commandId));
     }
 
     public function getCommandStatus(string $queueName, string $commandId): string

@@ -4,8 +4,6 @@ namespace spec\MGDigital\BusQue;
 
 use MGDigital\BusQue\BusQue;
 use MGDigital\BusQue\QueuedCommand;
-use MGDigital\BusQue\ReceivedCommand;
-use MGDigital\BusQue\ReceivedScheduledCommand;
 use MGDigital\BusQue\ScheduledCommand;
 
 class BusQueSpec extends AbstractSpec
@@ -46,15 +44,15 @@ class BusQueSpec extends AbstractSpec
 
     public function it_can_queue_a_command()
     {
-        $this->commandBusAdapter->handle(new QueuedCommand('test_command'))->shouldBeCalled();
-        $this->queueCommand('test_command');
+        $this->commandBusAdapter->handle(new QueuedCommand('test_command', 'test_id'))->shouldBeCalled();
+        $this->queueCommand('test_command', 'test_id');
     }
 
     public function it_can_schedule_a_command()
     {
         $dateTime = new \DateTime();
-        $this->commandBusAdapter->handle(new ScheduledCommand('test_command', $dateTime))->shouldBeCalled();
-        $this->scheduleCommand('test_command', $dateTime);
+        $this->commandBusAdapter->handle(new ScheduledCommand('test_command', $dateTime, 'test_id'))->shouldBeCalled();
+        $this->scheduleCommand('test_command', $dateTime, 'test_id');
     }
 
     public function it_can_get_the_status_of_a_command()
