@@ -13,7 +13,8 @@
     },
     "require-dev": {
         "phpspec/phpspec": "~2.5",
-        "phpunit/phpunit": "~4.3"
+        "phpunit/phpunit": "~4.3",
+        "squizlabs/php_codesniffer": "~2.6"
     },
     "suggest": {
         "rybakit/msgpack": "For serialization to MessagePack format",

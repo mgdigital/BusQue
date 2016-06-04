@@ -12,7 +12,8 @@ abstract class AbstractCommand extends Command
     protected $container;
     private $implementationId;
 
-    public function __construct(ContainerInterface $container, string $implementationId = 'busque.implementation') {
+    public function __construct(ContainerInterface $container, string $implementationId = 'busque.implementation')
+    {
         parent::__construct();
         $this->container = $container;
         $this->implementationId = $implementationId;
@@ -22,5 +23,4 @@ abstract class AbstractCommand extends Command
     {
         return $this->container->get($this->implementationId);
     }
-
 }

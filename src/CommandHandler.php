@@ -7,7 +7,8 @@ class CommandHandler
 
     private $implementation;
 
-    public function __construct(Implementation $implementation) {
+    public function __construct(Implementation $implementation)
+    {
         $this->implementation = $implementation;
     }
 
@@ -41,5 +42,4 @@ class CommandHandler
             ->serialize($baseCommand);
         return [$queueName, $commandId, $serialized];
     }
-
 }

@@ -6,5 +6,4 @@ interface ErrorHandlerInterface
 {
 
     public function handle($command, \Throwable $error);
-
 }

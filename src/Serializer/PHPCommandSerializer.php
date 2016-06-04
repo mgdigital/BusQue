@@ -16,5 +16,4 @@ class PHPCommandSerializer implements CommandSerializerInterface
     {
         return unserialize($serialized);
     }
-
 }

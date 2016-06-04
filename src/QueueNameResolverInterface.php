@@ -6,5 +6,4 @@ interface QueueNameResolverInterface
 {
 
     public function resolveQueueName($command): string;
-
 }

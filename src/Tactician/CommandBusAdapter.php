@@ -19,5 +19,4 @@ class CommandBusAdapter implements CommandBusAdapterInterface
     {
         $this->commandBus->handle($command);
     }
-
 }

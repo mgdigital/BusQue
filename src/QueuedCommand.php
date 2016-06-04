@@ -23,5 +23,4 @@ final class QueuedCommand
     {
         return $this->id;
     }
-
 }

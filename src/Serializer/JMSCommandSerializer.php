@@ -28,5 +28,4 @@ class JMSCommandSerializer implements CommandSerializerInterface
     {
         return $this->jmsSerializer->deserialize($serialized, $this->type, $this->format);
     }
-
 }

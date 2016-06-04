@@ -6,5 +6,4 @@ interface CommandIdGeneratorInterface
 {
 
     public function generateId($command): string;
-
 }

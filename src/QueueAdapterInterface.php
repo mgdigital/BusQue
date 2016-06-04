@@ -38,5 +38,4 @@ interface QueueAdapterInterface
      * @throws TimeoutException
      */
     public function awaitCommand(string $queueName, int $timeout = null): ReceivedCommand;
-
 }

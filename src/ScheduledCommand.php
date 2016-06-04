@@ -30,5 +30,4 @@ final class ScheduledCommand
     {
         return $this->id;
     }
-
 }

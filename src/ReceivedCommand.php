@@ -30,5 +30,4 @@ class ReceivedCommand
     {
         return $this->serialized;
     }
-
 }

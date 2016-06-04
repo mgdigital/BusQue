@@ -6,5 +6,4 @@ interface CommandBusAdapterInterface
 {
 
     public function handle($command);
-
 }

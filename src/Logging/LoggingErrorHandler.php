@@ -22,5 +22,4 @@ class LoggingErrorHandler implements ErrorHandlerInterface
             'error' => $error,
         ]);
     }
-
 }

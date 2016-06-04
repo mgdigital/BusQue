@@ -25,11 +25,11 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function queueCommand(string $queueName, string $id, string $serialized)
     {
-        if (!self::_isCommandIdReserved($this->client, $queueName, $id)) {
+        if (!self::cIsCommandIdReserved($this->client, $queueName, $id)) {
             $this->client->pipeline(function ($client) use ($queueName, $id, $serialized) {
-                self::_storeCommand($client, $queueName, $id, $serialized);
-                self::_reserveCommandId($client, $queueName, $id);
-                self::_updateCommandStatus($client, $queueName, $id, self::STATUS_QUEUED);
+                self::cStoreCommand($client, $queueName, $id, $serialized);
+                self::cReserveCommandId($client, $queueName, $id);
+                self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_QUEUED);
                 $client->lpush(":{$queueName}:queue", [$id]);
             });
         }
@@ -56,16 +56,16 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         /* @var $queueName string */
         /* @var $id string */
         list(, $serialized) = $this->client->pipeline(function ($client) use ($queueName, $id) {
-            self::_updateCommandStatus($client, $queueName, $id, self::STATUS_IN_PROGRESS);
-            self::_retrieveCommand($client, $queueName, $id);
-            self::_releaseReservedCommandId($client, $queueName, $id);
+            self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_IN_PROGRESS);
+            self::cRetrieveCommand($client, $queueName, $id);
+            self::cReleaseReservedCommandId($client, $queueName, $id);
         });
         return new ReceivedCommand($queueName, $id, $serialized);
     }
 
     public function getCommand(string $queueName, string $id): ReceivedCommand
     {
-        $serialized = self::_retrieveCommand($this->client, $queueName, $id);
+        $serialized = self::cRetrieveCommand($this->client, $queueName, $id);
         return new ReceivedCommand($queueName, $id, $serialized);
     }
 
@@ -76,22 +76,22 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function setCommandCompleted(string $queueName, string $id)
     {
-        $this->client->pipeline(function ($client) use($queueName, $id) {
-            self::_endCommand($client, $queueName, $id, self::STATUS_COMPLETED);
+        $this->client->pipeline(function ($client) use ($queueName, $id) {
+            self::cEndCommand($client, $queueName, $id, self::STATUS_COMPLETED);
         });
     }
 
     public function setCommandFailed(string $queueName, string $id)
     {
-        $this->client->pipeline(function ($client) use($queueName, $id) {
-            self::_endCommand($client, $queueName, $id, self::STATUS_FAILED);
+        $this->client->pipeline(function ($client) use ($queueName, $id) {
+            self::cEndCommand($client, $queueName, $id, self::STATUS_FAILED);
         });
     }
 
     public function putQueue(string $queueName)
     {
-        $this->client->pipeline(function ($client) use($queueName) {
-            self::_addQueue($client, $queueName);
+        $this->client->pipeline(function ($client) use ($queueName) {
+            self::cAddQueue($client, $queueName);
         });
     }
 
@@ -107,13 +107,13 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function emptyQueue(string $queueName)
     {
-        self::_emptyQueue($this->client, $queueName);
+        self::cEmptyQueue($this->client, $queueName);
     }
 
     public function deleteQueue(string $queueName)
     {
         $this->client->pipeline(function ($client) use ($queueName) {
-            self::_deleteQueue($client, $queueName);
+            self::cDeleteQueue($client, $queueName);
         });
     }
 
@@ -122,7 +122,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         $this->client->pipeline(function ($client) use ($queueName, $id) {
             $client->hdel(":{$queueName}:command_store", [$id]);
             $client->hdel(":{$queueName}:command_status", [$id]);
-            self::_releaseReservedCommandId($client, $queueName, $id);
+            self::cReleaseReservedCommandId($client, $queueName, $id);
             $json = json_encode([$queueName, $id]);
             $client->zrem(':schedule', $json);
         });
@@ -130,11 +130,11 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function scheduleCommand(string $queueName, string $id, string $serialized, \DateTime $dateTime)
     {
-        if (!self::_isCommandIdReserved($this->client, $queueName, $id)) {
+        if (!self::cIsCommandIdReserved($this->client, $queueName, $id)) {
             $this->client->pipeline(function ($client) use ($queueName, $id, $serialized, $dateTime) {
-                self::_storeCommand($client, $queueName, $id, $serialized);
-                self::_reserveCommandId($client, $queueName, $id);
-                self::_updateCommandStatus($client, $queueName, $id, self::STATUS_SCHEDULED);
+                self::cStoreCommand($client, $queueName, $id, $serialized);
+                self::cReserveCommandId($client, $queueName, $id);
+                self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_SCHEDULED);
                 $json = json_encode([$queueName, $id]);
                 $client->zadd(':schedule', [$json => $dateTime->getTimestamp()]);
             });
@@ -161,7 +161,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
                         list($thisQueueName, $id) = json_decode($json, true);
                         if ($thisQueueName === $queueName) {
                             $client->zrem(':schedule', $json);
-                            self::_releaseReservedCommandId($client, $queueName, $id);
+                            self::cReleaseReservedCommandId($client, $queueName, $id);
                         }
                     }
                 });
@@ -169,8 +169,12 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         }
     }
 
-    public function awaitScheduledCommands(ClockInterface $clock, int $n = null, int $timeout = null, \DateInterval $expiry = null): array
-    {
+    public function awaitScheduledCommands(
+        ClockInterface $clock,
+        int $n = null,
+        int $timeout = null,
+        \DateInterval $expiry = null
+    ): array {
         $stopwatchStart = time();
         while (true) {
             $currentTime = $clock->getTime();
@@ -189,10 +193,10 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             foreach ($result as $json => $score) {
                 list($queueName, $id) = json_decode($json, true);
                 $dateTime = new \DateTime("@{$score}");
-                list(, $serialized) = $this->client->pipeline(function ($client) use($json, $queueName, $id) {
+                list(, $serialized) = $this->client->pipeline(function ($client) use ($json, $queueName, $id) {
                     $client->zrem(':schedule', $json);
-                    self::_retrieveCommand($client, $queueName, $id);
-                    self::_releaseReservedCommandId($client, $queueName, $id);
+                    self::cRetrieveCommand($client, $queueName, $id);
+                    self::cReleaseReservedCommandId($client, $queueName, $id);
                 });
                 $commands[] = new ReceivedScheduledCommand($queueName, $id, $serialized, $dateTime);
             }
@@ -211,51 +215,51 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         }
     }
 
-    private static function _storeCommand($client, string $queueName, string $id, string $serialized)
+    private static function cStoreCommand($client, string $queueName, string $id, string $serialized)
     {
-        self::_addQueue($client, $queueName);
+        self::cAddQueue($client, $queueName);
         $client->hset(":{$queueName}:command_store", $id, $serialized);
     }
 
-    private static function _retrieveCommand($client, string $queueName, string $id)
+    private static function cRetrieveCommand($client, string $queueName, string $id)
     {
         return $client->hget(":{$queueName}:command_store", $id);
     }
 
-    private static function _reserveCommandId($client, string $queueName, string $id)
+    private static function cReserveCommandId($client, string $queueName, string $id)
     {
         $client->sadd(":{$queueName}:queue_ids", [$id]);
     }
 
-    private static function _endCommand($client, string $queueName, string $id, string $status)
+    private static function cEndCommand($client, string $queueName, string $id, string $status)
     {
-        self::_updateCommandStatus($client, $queueName, $id, $status);
-        self::_releaseReservedCommandId($client, $queueName, $id);
+        self::cUpdateCommandStatus($client, $queueName, $id, $status);
+        self::cReleaseReservedCommandId($client, $queueName, $id);
         $client->srem(":{$queueName}:queue_ids", [$id]);
         $client->lrem(":{$queueName}:consuming", 1, $id);
     }
 
-    private static function _releaseReservedCommandId($client, string $queueName, string $id)
+    private static function cReleaseReservedCommandId($client, string $queueName, string $id)
     {
         $client->srem(":{$queueName}:queue_ids", [$id]);
     }
 
-    private static function _isCommandIdReserved($client, string $queueName, string $id)
+    private static function cIsCommandIdReserved($client, string $queueName, string $id)
     {
         return $client->sismember(":{$queueName}:queue_ids", $id);
     }
 
-    private static function _updateCommandStatus($client, string $queueName, string $id, string $status)
+    private static function cUpdateCommandStatus($client, string $queueName, string $id, string $status)
     {
         $client->hset(":{$queueName}:command_status", $id, $status);
     }
 
-    private static function _addQueue($client, string $queueName)
+    private static function cAddQueue($client, string $queueName)
     {
         $client->sadd(':queues', [$queueName]);
     }
 
-    private static function _emptyQueue($client, string $queueName)
+    private static function cEmptyQueue($client, string $queueName)
     {
         $client->del([
             ":{$queueName}:queue",
@@ -266,10 +270,9 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         ]);
     }
 
-    private static function _deleteQueue($client, string $queueName)
+    private static function cDeleteQueue($client, string $queueName)
     {
-        self::_emptyQueue($client, $queueName);
+        self::cEmptyQueue($client, $queueName);
         $client->srem(':queues', $queueName);
     }
-
 }

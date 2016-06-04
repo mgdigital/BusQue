@@ -37,5 +37,4 @@ class ReceivedScheduledCommand
     {
         return $this->dateTime;
     }
-
 }

@@ -18,4 +18,5 @@ install:
   - composer install --prefer-source --no-interaction
 
 script:
-   - vendor/phpspec/phpspec/bin/phpspec run --config=phpspec.yml --format=pretty
+  - vendor/squizlabs/php_codesniffer/scripts/phpcs --runtime-set default_standard PSR2 src
+  - vendor/phpspec/phpspec/bin/phpspec run --config=phpspec.yml --format=pretty

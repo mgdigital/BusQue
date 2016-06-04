@@ -30,5 +30,4 @@ class QueueWorkerCommand extends AbstractCommand
         $output->writeln(sprintf('Working on queue %s...', $queueName));
         $worker->work($queueName, $number, $time);
     }
-
 }

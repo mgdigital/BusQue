@@ -27,5 +27,4 @@ class MessagePackCommandSerializer implements CommandSerializerInterface
     {
         return $this->unpacker->reset($serialized)->unpack();
     }
-
 }

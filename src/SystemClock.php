@@ -9,5 +9,4 @@ class SystemClock implements ClockInterface
     {
         return new \DateTime();
     }
-
 }

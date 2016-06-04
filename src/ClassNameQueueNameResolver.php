@@ -9,5 +9,4 @@ class ClassNameQueueNameResolver implements QueueNameResolverInterface
     {
         return str_replace('\\', '_', get_class($command));
     }
-
 }

@@ -19,5 +19,4 @@ class Md5IdGenerator implements CommandIdGeneratorInterface
     {
         return md5($this->serializer->serialize($command));
     }
-
 }

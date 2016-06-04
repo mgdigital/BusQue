@@ -6,5 +6,4 @@ interface ClockInterface
 {
 
     public function getTime(): \DateTime;
-
 }

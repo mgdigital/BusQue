@@ -11,5 +11,4 @@ class ObjectHashIdGenerator implements CommandIdGeneratorInterface
     {
         return spl_object_hash($command);
     }
-
 }

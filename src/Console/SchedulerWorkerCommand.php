@@ -27,5 +27,4 @@ class SchedulerWorkerCommand extends AbstractCommand
         $output->writeln('Awaiting scheduled commands...');
         $worker->work($number, $time);
     }
-
 }
