@@ -25,6 +25,8 @@ Or get the Symfony bundle:
 
     composer require mgdigital/busque-bundle
 
+You'll also need a [Redis](http://redis.io/) server to run the queues on.
+
 
 Usage
 -----
