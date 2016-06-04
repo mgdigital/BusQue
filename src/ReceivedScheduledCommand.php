@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue;
 
-final class ReceivedScheduledCommand
+class ReceivedScheduledCommand
 {
 
     private $queueName;
