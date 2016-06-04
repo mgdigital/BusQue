@@ -67,6 +67,7 @@ If you're using the Symfony bundle, then all of the above is done for you, and y
 <?php
 
 $command = new SendEmailCommand('joe@example.com', 'Hello Joe!');
+
 $commandBus->handle(new BusQue\QueuedCommand($command));
 
 // or
