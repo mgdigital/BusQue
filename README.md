@@ -29,7 +29,7 @@ Or get the Symfony bundle:
 Usage
 -----
 
-To use BusQue you first need to instantiate an instance of `BusQue\Implementation` with its dependencies, or with the Symfony bundle you can get the `busque.implementation` service from the container.
+To use BusQue you first need to instantiate an instance of `BusQue\Implementation` with its dependencies.
 
 Adapters for the following interfaces are available in this repository or you can write your own:
  
@@ -49,12 +49,14 @@ $dependencies = [
     new BusQue\ErrorHandlerInterface
 ];
 
-$implementation = new BusQue\Implementation(...$dependencies); 
-```   
+$implementation = new BusQue\Implementation(...$dependencies);
 
-The `BusQue\CommandHandler` class then needs to be registered with your command bus (Tactician). The Symfony bundle does all this for you.
+$busque = new BusQue\BusQue($implementation);
+```
 
-See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
+The `BusQue\CommandHandler` class then needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
+
+If you're using the Symfony bundle, then all of the above is done for you, and you can just get the `busque` service from the container.
 
 
 ### Queuing a command
@@ -74,8 +76,7 @@ $commandBus->handle(new BusQue\QueuedCommand($command));
 ```php
 <?php
 
-$worker = new BusQue\QueueWorker($implementation);
-$worker->work('SendEmailCommand'); // Hello Joe!
+$busque->workQueue('SendEmailCommand'); // Hello Joe!
 ```
 
 Or in your Symfony app run `app/console busque:queue_worker SendEmailCommand`
@@ -101,8 +102,7 @@ Only one scheduler worker is needed to manage the schedule for all queues. The s
 ```php
 <?php
 
-$schedulerWorker = new BusQue\SchedulerWorker($implementation);
-$schedulerWorker->work(); // 1 minute later... Hello Joe!
+$busque->workSchedule(); // 1 minute later... Hello Joe!
 ```
 
 Or in your Symfony app run `app/console busque:scheduler_worker`
@@ -139,8 +139,8 @@ When we know the ID of a command and the name of its queue, we can also check it
 ```php
 <?php
 
-$queueName = $implementation->getQueueNameResolver()->resolveQueueName($command);
-echo $implementation->getQueueAdapter()->getCommandStatus($queueName, $uniqueCommandId); // completed
+$queueName = $busque->getQueueName($command);
+echo $busque->getCommandStatus($queueName, $uniqueCommandId); // completed
 ```   
 
 
@@ -151,7 +151,7 @@ We can also check the number of items in any queue:
 ```php
 <?php
 
-echo $implementation->getQueueAdapter()->getQueuedCount($queueName); // 0
+echo $busque->getQueuedCount($queueName); // 0
 ```
 
 
@@ -162,7 +162,7 @@ If you want to remove a command for any reason, you can remove all trace of it w
 ```php
 <?php
 
-$implementation->getQueueAdapter()->purgeCommand($queueName, $uniqueCommandId);
+$busque->purgeCommand($queueName, $uniqueCommandId);
 ```
 
 
@@ -171,7 +171,7 @@ $implementation->getQueueAdapter()->purgeCommand($queueName, $uniqueCommandId);
 ```
 <?php
 
-$implementation->getQueueAdaptor()->clearQueue($queueName);
+$busque->emptyQueue($queueName);
 ```
 
 
