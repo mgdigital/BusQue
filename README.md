@@ -226,6 +226,10 @@ $busque->emptyQueue($queueName);
 Tests
 -----
 
+See the test suite output on Travis CI (if this isn't green now it usually is, honest!):
+
+[![Build Status](https://travis-ci.org/mgdigital/BusQue.svg?branch=master)](https://travis-ci.org/mgdigital/BusQue)
+
 Run the phpspec test suite:
 
     bin/phpspec run -f pretty
