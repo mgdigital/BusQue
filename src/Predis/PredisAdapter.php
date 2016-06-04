@@ -100,7 +100,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         return $this->client->smembers(':queues');
     }
 
-    public function getQueuedCount(string $queueName, string $status = null): int
+    public function getQueuedCount(string $queueName): int
     {
         return $this->client->llen(":{$queueName}:queue");
     }
