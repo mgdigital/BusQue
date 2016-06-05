@@ -202,17 +202,31 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             'withscores' => true,
         ]);
         $commands = [];
-        foreach ($result as $json => $score) {
-            list($queueName, $id) = json_decode($json, true);
-            $dateTime = new \DateTime("@{$score}");
-            list(, $serialized) = $this->client->pipeline(
-                function (ClientContextInterface $client) use ($json, $queueName, $id) {
-                    $client->zrem(':schedule', $json);
-                    self::cRetrieveCommand($client, $queueName, $id);
-                    self::cReleaseReservedCommandId($client, $queueName, $id);
+        if ($result !== []) {
+            $queueNamesById = $idsByJson = [];
+            $pipelineReturn = $this->client->pipeline(
+                function (ClientContextInterface $client) use (&$result, &$queueNamesById, &$idsByJson) {
+                    foreach ($result as $json => $score) {
+                        list($queueName, $id) = json_decode($json, true);
+                        $queueNamesById[$id] = $queueName;
+                        $idsByJson[$json] = $id;
+                        self::cRetrieveCommand($client, $queueName, $id);
+                    }
+                    $client->zrem(':schedule', ...array_keys($result));
+                    foreach ($queueNamesById as $id => $queueName) {
+                        self::cReleaseReservedCommandId($client, $queueName, $id);
+                    }
                 }
             );
-            $commands[] = new ReceivedScheduledCommand($queueName, $id, $serialized, $dateTime);
+            foreach (array_keys($result) as $index => $json) {
+                $id = $idsByJson[$json];
+                $commands[] = new ReceivedScheduledCommand(
+                    $queueNamesById[$id],
+                    $id,
+                    $pipelineReturn[$index],
+                    new \DateTime('@' . $result[$json])
+                );
+            }
         }
         return $commands;
     }
