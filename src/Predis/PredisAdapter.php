@@ -240,17 +240,12 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     {
         list ($isReserved) = $this->client->pipeline(
             function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
-                self::cIsCommandIdReserved($client, $queueName, $id);
-                self::cStoreCommand($client, $queueName, $id, $serialized);
+                $client->sismember(":{$queueName}:queue_ids", $id);
+                $client->hset(":{$queueName}:command_store", $id, $serialized);
+                self::cAddQueue($client, $queueName);
             }
         );
         return $isReserved;
-    }
-
-    private static function cStoreCommand($client, string $queueName, string $id, string $serialized)
-    {
-        self::cAddQueue($client, $queueName);
-        $client->hset(":{$queueName}:command_store", $id, $serialized);
     }
 
     private static function cRetrieveCommand($client, string $queueName, string $id)
@@ -274,11 +269,6 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     private static function cReleaseReservedCommandIds($client, string $queueName, array $ids)
     {
         $client->srem(":{$queueName}:queue_ids", $ids);
-    }
-
-    private static function cIsCommandIdReserved($client, string $queueName, string $id)
-    {
-        return $client->sismember(":{$queueName}:queue_ids", $id);
     }
 
     private static function cUpdateCommandStatus($client, string $queueName, string $id, string $status)
