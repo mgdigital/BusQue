@@ -31,39 +31,13 @@ You'll also need a [Redis](http://redis.io/) server to run the queues on.
 Usage
 -----
 
-To use BusQue you first need to instantiate an instance of `BusQue\Implementation` with its dependencies.
+To use BusQue you first need to instantiate an instance of `BusQue\Implementation` with its dependencies. If you're using BusQue standalone, a basic configuration could look something like this:
 
-Adapters for the following interfaces are available in this repository or you can write your own:
- 
 ```php
 <?php
 
 use MGDigital\BusQue as BusQue;
 
-$implementation = new BusQue\Implementation(
-    new BusQue\QueueNameResolverInterface,
-    new BusQue\CommandSerializerInterface,
-    new BusQue\CommandIdGeneratorInterface,
-    new BusQue\QueueAdapterInterface,
-    new BusQue\SchedulerAdapterInterface,
-    new BusQue\ClockInterface,
-    new BusQue\CommandBusAdapterInterface,
-    new BusQue\ErrorHandlerInterface
-);
-
-$busque = new BusQue\BusQue($implementation);
-```
-
-The `BusQue\CommandHandler` class also needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
-
-If you're using the Symfony bundle, then all of the above is done for you, and you can just get the `busque` service from the container.
-
-If you're using BusQue standalone, a basic configuration could look something like this:
-
-```php
-<?php
-
-// This is where the magic happens:
 $predisAdapter = new BusQue\Predis\PredisAdapter(new Predis\Client());
 
 $implementation = new BusQue\Implementation(
@@ -86,6 +60,10 @@ $implementation = new BusQue\Implementation(
 
 $busque = new BusQue\BusQue($implementation);
 ```
+The `BusQue\CommandHandler` class also needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
+
+If you're using the Symfony bundle, then all of the above is done for you, and you can just get the `busque` service from the container.
+
 
 ### Queuing a command
 
