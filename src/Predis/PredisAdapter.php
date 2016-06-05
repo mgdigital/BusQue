@@ -219,11 +219,10 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
                         $idsByJson[$json] = $id;
                         self::cRetrieveCommand($client, $queueName, $id);
                     }
-                    $client->zrem(':schedule', ...array_keys($result));
+                    $client->zrem(':schedule', array_keys($result));
                     foreach ($idsByQueueName as $queueName => $ids) {
                         self::cReleaseReservedCommandIds($client, $queueName, $ids);
                     }
-
                 }
             );
             foreach (array_keys($result) as $index => $json) {
