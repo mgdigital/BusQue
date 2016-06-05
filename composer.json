@@ -21,8 +21,7 @@
     },
     "suggest": {
         "rybakit/msgpack": "For serialization to MessagePack format",
-        "jms/serializer": "For serialization to json or XML",
-        "symfony/console": "To run the console commands"
+        "jms/serializer": "For serialization to json or XML"
     },
     "config": {
         "bin-dir": "bin"
