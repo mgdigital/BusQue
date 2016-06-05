@@ -26,11 +26,7 @@ final class CommandHandler
             ->scheduleCommand($queueName, $id, $serialized, $scheduledCommand->getDateTime());
     }
 
-    /**
-     * @param QueuedCommand|ScheduledCommand $command
-     * @return array
-     */
-    private function process($command): array
+    private function process(BusQueCommandInterface $command): array
     {
         $baseCommand = $command->getCommand();
         $queueName = $this->implementation->getQueueNameResolver()

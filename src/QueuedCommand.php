@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue;
 
-final class QueuedCommand
+final class QueuedCommand implements BusQueCommandInterface
 {
     
     private $command;

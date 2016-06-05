@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue;
 
-final class ScheduledCommand
+final class ScheduledCommand implements BusQueCommandInterface
 {
 
     private $command;
