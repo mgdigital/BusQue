@@ -58,7 +58,7 @@ $implementation = new BusQue\Implementation(
     new BusQue\Logging\LoggingErrorHandler(new Psr\Log\NullLogger())
 );
 
-$busque = new BusQue\BusQue($implementation);
+$busQue = new BusQue\BusQue($implementation);
 ```
 The `BusQue\CommandHandler` class also needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
 
@@ -78,7 +78,7 @@ $commandBus->handle(new BusQue\QueuedCommand($command));
 
 // or
 
-$busque->queueCommand($command);
+$busQue->queueCommand($command);
 ```
 
 
@@ -87,7 +87,7 @@ $busque->queueCommand($command);
 ```php
 <?php
 
-$busque->workQueue('SendEmailCommand'); // Hello Joe!
+$busQue->workQueue('SendEmailCommand'); // Hello Joe!
 ```
 
 Or in your Symfony app run `app/console busque:queue_worker SendEmailCommand`
@@ -106,7 +106,7 @@ $commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minu
 
 // or
 
-$busque->scheduleCommand($command, new \DateTime('+1 minute'));
+$busQue->scheduleCommand($command, new \DateTime('+1 minute'));
 ```
 
 
@@ -117,7 +117,7 @@ Only one scheduler worker is needed to manage the schedule for all queues. The s
 ```php
 <?php
 
-$busque->workSchedule(); // 1 minute later... Hello Joe!
+$busQue->workSchedule(); // 1 minute later... Hello Joe!
 ```
 
 Or in your Symfony app run `app/console busque:scheduler_worker`
@@ -154,8 +154,8 @@ When we know the ID of a command and the name of its queue, we can also check it
 ```php
 <?php
 
-$queueName = $busque->getQueueName($command);
-echo $busque->getCommandStatus($queueName, $uniqueCommandId); // completed
+$queueName = $busQue->getQueueName($command);
+echo $busQue->getCommandStatus($queueName, $uniqueCommandId); // completed
 ```   
 
 
@@ -166,7 +166,7 @@ We can also check the number of items in any queue:
 ```php
 <?php
 
-echo $busque->getQueuedCount($queueName); // 0
+echo $busQue->getQueuedCount($queueName); // 0
 ```
 
 
@@ -177,7 +177,7 @@ Queues are created automatically if they don't exist, using whichever queue name
 ```php
 <?php
 
-$queues = $busque->listQueues(); // ['SendEmailCommand', 'SyncStockCommand']
+$queues = $busQue->listQueues(); // ['SendEmailCommand', 'SyncStockCommand']
 ```
 
 
@@ -188,7 +188,7 @@ If you want to cancel a command for any reason, you can remove all trace of it w
 ```php
 <?php
 
-$busque->purgeCommand($queueName, $uniqueCommandId);
+$busQue->purgeCommand($queueName, $uniqueCommandId);
 ```
 
 
@@ -197,7 +197,7 @@ $busque->purgeCommand($queueName, $uniqueCommandId);
 ```
 <?php
 
-$busque->emptyQueue($queueName);
+$busQue->emptyQueue($queueName);
 ```
 
 
