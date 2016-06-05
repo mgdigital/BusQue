@@ -54,6 +54,7 @@ Feature: Command Bus Queue
     And I schedule "test_command" with ID "test_id" to run at 15:00
     And I schedule "overwritten_test_command" with ID "test_id" to run at 14:00
     And I schedule "another_command" with ID "another_id" to run at 15:01
+    And I schedule "yet_another_command" with ID "yet_another_id" to run at 15:02
     And the time is 14:50
     Then the command with ID "test_id" should have a status of "scheduled"
     And the command with ID "another_id" should have a status of "scheduled"
@@ -72,6 +73,11 @@ Feature: Command Bus Queue
     And the command with ID "another_id" should have a status of "completed"
     And there should be 0 commands in the queue
     And I run the scheduler worker
+    And there should be 0 commands in the queue
+    And the time is 15:03
+    And I run the scheduler worker
+    And there should be 1 commands in the queue
+    And I run the queue worker
     And there should be 0 commands in the queue
 
   Scenario: Cancelling a scheduled command
