@@ -17,39 +17,45 @@ class QueueWorker
     public function work(string $queueName, int $n = null, int $time = null)
     {
         $stopwatchStart = time();
-        $queue = $this->implementation->getQueueAdapter();
-        $serializer = $this->implementation->getCommandSerializer();
-        $commandBus = $this->implementation->getCommandBusAdapter();
-        $errorHandler = $this->implementation->getErrorHandler();
         while ($n === null || $n > 0) {
-            try {
-                $received = $queue->awaitCommand($queueName, $time);
-            } catch (TimeoutException $e) {
+            $this->iterate($queueName, $time);
+            $n === null || $n--;
+            if ($time !== null && (time() - $stopwatchStart >= $time)) {
                 break;
             }
-            $command = null;
-            try {
-                $command = $serializer->unserialize($received->getSerialized());
-                $commandBus->handle($command);
-                $queue->setCommandCompleted($received->getQueueName(), $received->getId());
-            } catch (\Throwable $exception) {
-                $queue->setCommandFailed($queueName, $received->getId());
-                if ($command === null) {
-                    $errorHandler->handleUnserializationError(
+        }
+    }
+
+    private function iterate(string $queueName, int $time = null)
+    {
+        try {
+            $received = $this->implementation->getQueueAdapter()
+                ->awaitCommand($queueName, $time);
+        } catch (TimeoutException $e) {
+            return;
+        }
+        $command = null;
+        try {
+            $command = $this->implementation->getCommandSerializer()
+                ->unserialize($received->getSerialized());
+            $this->implementation->getCommandBusAdapter()
+                ->handle($command);
+            $this->implementation->getQueueAdapter()
+                ->setCommandCompleted($received->getQueueName(), $received->getId());
+        } catch (\Throwable $exception) {
+            $this->implementation->getQueueAdapter()
+                ->setCommandFailed($queueName, $received->getId());
+            if ($command === null) {
+                $this->implementation->getErrorHandler()
+                    ->handleUnserializationError(
                         $queueName,
                         $received->getId(),
                         $received->getSerialized(),
                         $exception
                     );
-                } else {
-                    $errorHandler->handleCommandError($command, $exception);
-                }
-            }
-            if ($n !== null) {
-                $n--;
-            }
-            if ($time !== null && (time() - $stopwatchStart >= $time)) {
-                break;
+            } else {
+                $this->implementation->getErrorHandler()
+                    ->handleCommandError($command, $exception);
             }
         }
     }
