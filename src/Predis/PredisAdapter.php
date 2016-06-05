@@ -25,9 +25,14 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function queueCommand(string $queueName, string $id, string $serialized)
     {
-        if (!self::cIsCommandIdReserved($this->client, $queueName, $id)) {
-            $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
+        list ($isReserved) = $this->client->pipeline(
+            function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
+                self::cIsCommandIdReserved($client, $queueName, $id);
                 self::cStoreCommand($client, $queueName, $id, $serialized);
+            }
+        );
+        if (!$isReserved) {
+            $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
                 self::cReserveCommandId($client, $queueName, $id);
                 self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_QUEUED);
                 $client->lpush(":{$queueName}:queue", [$id]);
