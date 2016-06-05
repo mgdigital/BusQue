@@ -1,0 +1,10 @@
+build:
+    environment:
+        php: 7.0.6
+        redis: true
+checks:
+    php: true
+filter:
+    excluded_paths:
+        - features/*
+        - spec/*
