@@ -25,13 +25,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function queueCommand(string $queueName, string $id, string $serialized)
     {
-        list ($isReserved) = $this->client->pipeline(
-            function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
-                self::cIsCommandIdReserved($client, $queueName, $id);
-                self::cStoreCommand($client, $queueName, $id, $serialized);
-            }
-        );
-        if (!$isReserved) {
+        if (!$this->storeCommandAndCheckReservationStatus($queueName, $id, $serialized)) {
             $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id) {
                 self::cReserveCommandId($client, $queueName, $id);
                 self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_QUEUED);
@@ -154,13 +148,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function scheduleCommand(string $queueName, string $id, string $serialized, \DateTime $dateTime)
     {
-        list ($isReserved) = $this->client->pipeline(
-            function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
-                self::cIsCommandIdReserved($client, $queueName, $id);
-                self::cStoreCommand($client, $queueName, $id, $serialized);
-            }
-        );
-        if (!$isReserved) {
+        if (!$this->storeCommandAndCheckReservationStatus($queueName, $id, $serialized)) {
             $this->client->pipeline(
                 function (ClientContextInterface $client) use ($queueName, $id, $dateTime) {
                     self::cReserveCommandId($client, $queueName, $id);
@@ -246,6 +234,17 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             }
         }
         return $commands;
+    }
+
+    private function storeCommandAndCheckReservationStatus(string $queueName, string $id, string $serialized): bool
+    {
+        list ($isReserved) = $this->client->pipeline(
+            function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
+                self::cIsCommandIdReserved($client, $queueName, $id);
+                self::cStoreCommand($client, $queueName, $id, $serialized);
+            }
+        );
+        return $isReserved;
     }
 
     private static function cStoreCommand($client, string $queueName, string $id, string $serialized)
