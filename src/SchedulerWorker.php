@@ -30,30 +30,41 @@ class SchedulerWorker
     ) {
         $stopwatchStart = time();
         while ($limit === null || $limit > 0) {
-            $now = $this->implementation->getClock()->getTime();
-            if ($expiry === null) {
-                $start = null;
-            } else {
-                $start = clone $now;
-                $start = $start->sub($expiry);
-            }
-            $receivedCommands = $this->implementation->getSchedulerAdapter()
-                ->receiveDueCommands($now, $throttle, $start);
-            foreach ($receivedCommands as $received) {
-                $this->implementation->getQueueAdapter()
-                    ->queueCommand(
-                        $received->getQueueName(),
-                        $received->getId(),
-                        $received->getSerialized()
-                    );
-                if ($limit !== null) {
-                    $limit--;
+            $queuedCount = $this->iterate($throttle, $expiry);
+            if ($limit !== null) {
+                $limit -= $queuedCount;
+                if ($limit <= 0) {
+                    break;
                 }
             }
-            if (($limit !== null && $limit <= 0) || ($time !== null && (time() - $stopwatchStart >= $time))) {
+            if ($time !== null && (time() - $stopwatchStart >= $time)) {
                 break;
             }
             usleep($uSleepTime);
         }
+    }
+
+    private function iterate(int $throttle, \DateInterval $expiry = null): int
+    {
+        $count = 0;
+        $now = $this->implementation->getClock()->getTime();
+        if ($expiry === null) {
+            $start = null;
+        } else {
+            $start = clone $now;
+            $start = $start->sub($expiry);
+        }
+        $receivedCommands = $this->implementation->getSchedulerAdapter()
+            ->receiveDueCommands($now, $throttle, $start);
+        foreach ($receivedCommands as $received) {
+            $this->implementation->getQueueAdapter()
+                ->queueCommand(
+                    $received->getQueueName(),
+                    $received->getId(),
+                    $received->getSerialized()
+                );
+            $count++;
+        }
+        return $count;
     }
 }
