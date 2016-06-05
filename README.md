@@ -31,7 +31,7 @@ You'll also need a [Redis](http://redis.io/) server to run the queues on.
 Usage
 -----
 
-To use BusQue you first need to instantiate an instance of `BusQue\Implementation` with its dependencies. If you're using BusQue standalone, a basic configuration could look something like this:
+To use BusQue you first need to instantiate an instance of `BusQue\Implementation` with its dependencies. A basic configuration could look something like this:
 
 ```php
 <?php
