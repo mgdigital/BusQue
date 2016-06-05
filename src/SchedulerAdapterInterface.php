@@ -17,5 +17,9 @@ interface SchedulerAdapterInterface
      * @param \DateTime|null $startTime Return due commands since $startTime or the beginning of time.
      * @return ReceivedScheduledCommand[]
      */
-    public function receiveDueCommands(\DateTime $now, int $limit = 100, \DateTime $startTime = null): array;
+    public function receiveDueCommands(
+        \DateTime $now,
+        int $limit = SchedulerWorker::DEFAULT_THROTTLE,
+        \DateTime $startTime = null
+    ): array;
 }

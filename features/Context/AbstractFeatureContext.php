@@ -125,7 +125,15 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function theCommandShouldHaveRun()
     {
-        $this->commandBus->handle('test_command')->shouldHaveBeenCalled();
+        $this->theCommandArgShouldHaveRun('test_command');
+    }
+
+    /**
+     * @Then the command :arg1 should have run
+     */
+    public function theCommandArgShouldHaveRun($arg1)
+    {
+        $this->commandBus->handle($arg1)->shouldHaveBeenCalled();
     }
 
     /**
@@ -133,8 +141,16 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function theCommandShouldHaveAStatusOf($arg1)
     {
-        $status = $this->implementation->getQueueAdapter()->getCommandStatus('test_queue', 'test_command_id');
-        \PHPUnit_Framework_Assert::assertEquals($status, $arg1);
+        $this->theCommandWithIdShouldHaveAStatusOf('test_command_id', $arg1);
+    }
+
+    /**
+     * @Then the command with ID :arg1 should have a status of :arg2
+     */
+    public function theCommandWithIdShouldHaveAStatusOf($arg1, $arg2)
+    {
+        $status = $this->implementation->getQueueAdapter()->getCommandStatus('test_queue', $arg1);
+        \PHPUnit_Framework_Assert::assertEquals($status, $arg2);
     }
 
     /**
@@ -183,7 +199,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
     {
         $worker = new SchedulerWorker($this->implementation);
         try {
-            $worker->work(1, 1, 0);
+            $worker->work(null, 100, 0);
         } catch (TimeoutException $e) {}
     }
 }

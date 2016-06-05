@@ -48,20 +48,28 @@ Feature: Command Bus Queue
     Then there should be 0 commands in the queue
     And the command should have a status of "not_found"
 
-  Scenario: Scheduling a command
+  Scenario: Scheduling commands
     Given the queue is empty
-    And I schedule "test_command" to run at 15:00
+    And I schedule "test_command" with ID "test_id" to run at 15:00
+    And I schedule "another_command" with ID "another_id" to run at 15:01
     And the time is 14:50
-    And the command should have a status of "scheduled"
+    Then the command with ID "test_id" should have a status of "scheduled"
+    And the command with ID "another_id" should have a status of "scheduled"
     When I run the scheduler worker
     Then there should be 0 commands in the queue
     Then the time is 15:01
     When I run the scheduler worker
-    Then there should be 1 commands in the queue
-    And the command should have a status of "queued"
+    Then there should be 2 commands in the queue
+    And the command with ID "test_id" should have a status of "queued"
+    And the command with ID "another_id" should have a status of "queued"
     When I run the queue worker
-    Then the command should have run
-    And the command should have a status of "completed"
+    And I run the queue worker
+    Then the command "test_command" should have run
+    And the command "another_command" should have run
+    And the command with ID "test_id" should have a status of "completed"
+    And the command with ID "another_id" should have a status of "completed"
+    And there should be 0 commands in the queue
+    And I run the scheduler worker
     And there should be 0 commands in the queue
 
   Scenario: Cancelling a scheduled command
