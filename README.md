@@ -1,6 +1,8 @@
 BusQue
 ======
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/425b7104-519a-4292-abe2-bfebccee643e/big.png)](https://insight.sensiolabs.com/projects/425b7104-519a-4292-abe2-bfebccee643e)
+
 [![Build Status](https://travis-ci.org/mgdigital/BusQue.svg?branch=master)](https://travis-ci.org/mgdigital/BusQue)
 
 ### A flexible, modern command queue and scheduler for PHP7, built on Redis
