@@ -27,13 +27,23 @@ class QueueWorker
             } catch (TimeoutException $e) {
                 break;
             }
-            $command = $serializer->unserialize($received->getSerialized());
+            $command = null;
             try {
+                $command = $serializer->unserialize($received->getSerialized());
                 $commandBus->handle($command);
                 $queue->setCommandCompleted($received->getQueueName(), $received->getId());
-            } catch (\Exception $exception) {
-                $queue->setCommandFailed($received->getQueueName(), $received->getId());
-                $errorHandler->handle($command, $exception);
+            } catch (\Throwable $exception) {
+                $queue->setCommandFailed($queueName, $received->getId());
+                if ($command === null) {
+                    $errorHandler->handleUnserializationError(
+                        $queueName,
+                        $received->getId(),
+                        $received->getSerialized(),
+                        $exception
+                    );
+                } else {
+                    $errorHandler->handleCommandError($command, $exception);
+                }
             }
             if ($n !== null) {
                 $n--;

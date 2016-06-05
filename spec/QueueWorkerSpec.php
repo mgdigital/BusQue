@@ -23,7 +23,7 @@ final class QueueWorkerSpec extends AbstractSpec
         $this->work('test_queue', 1);
     }
 
-    public function it_can_handle_an_error()
+    public function it_can_handle_a_command_error()
     {
         $exception = new \Exception;
         $errorReceivedCommand = new ReceivedCommand('test_queue', 'error_id', 'error_serialized');
@@ -34,10 +34,27 @@ final class QueueWorkerSpec extends AbstractSpec
         $this->commandBusAdapter->handle('error_command')->willThrow($exception);
         $this->commandBusAdapter->handle('next_command')->willReturn(null);
         $this->queueAdapter->setCommandFailed('test_queue', 'error_id')->shouldBeCalled();
-        $this->errorHandler->handle('error_command', $exception)->shouldBeCalled();
+        $this->errorHandler->handleCommandError('error_command', $exception)->shouldBeCalled();
         $this->commandBusAdapter->handle('next_command')->shouldBeCalled();
         $this->queueAdapter->setCommandCompleted('test_queue', 'next_id')->shouldBeCalled();
         $this->work('test_queue', 2);
+    }
+    
+    public function it_can_handle_an_unserialization_error()
+    {
+        $exception = new \Exception;
+        $errorReceivedCommand = new ReceivedCommand('test_queue', 'error_id', 'cant_be_unserialized');
+        $nextReceivedCommand = new ReceivedCommand('test_queue', 'next_id', 'serialized');
+        $this->queueAdapter->awaitCommand('test_queue', null)->willReturn($errorReceivedCommand, $nextReceivedCommand);
+        $this->commandSerializer->unserialize('cant_be_unserialized')->willThrow($exception);
+        $this->commandSerializer->unserialize('serialized')->willReturn('next_command');
+        $this->commandBusAdapter->handle('next_command')->willReturn(null);
+        $this->queueAdapter->setCommandFailed('test_queue', 'error_id')->shouldBeCalled();
+        $this->errorHandler->handleUnserializationError('test_queue', 'error_id', 'cant_be_unserialized', $exception)->shouldBeCalled();
+        $this->commandBusAdapter->handle('next_command')->shouldBeCalled();
+        $this->queueAdapter->setCommandCompleted('test_queue', 'next_id')->shouldBeCalled();
+        $this->work('test_queue', 2);
+        
     }
 
 }

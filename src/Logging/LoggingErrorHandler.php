@@ -15,11 +15,20 @@ class LoggingErrorHandler implements ErrorHandlerInterface
         $this->logger = $logger;
     }
 
-    public function handle($command, \Throwable $error)
+    public function handleCommandError($command, \Throwable $error)
     {
         $this->logger->error($error->getMessage(), [
             'command' => $command,
             'error' => $error,
         ]);
+    }
+
+    public function handleUnserializationError(
+        string $queueName,
+        string $commandId,
+        string $serialized,
+        \Throwable $error
+    ) {
+        $this->logger->error($error->getMessage(), compact('queueName', 'commandId', 'serialized', 'error'));
     }
 }
