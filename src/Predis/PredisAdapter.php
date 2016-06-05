@@ -16,12 +16,10 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 {
 
     private $client;
-    private $schedulerDelay;
 
-    public function __construct(Client $client, int $schedulerDelay = 5)
+    public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->schedulerDelay = $schedulerDelay;
     }
 
     public function queueCommand(string $queueName, string $id, string $serialized)
