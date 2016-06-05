@@ -232,7 +232,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             } else {
                 $sleepTime = $this->schedulerDelay;
             }
-            sleep($sleepTime);
+            usleep($sleepTime * 1000000);
         }
     }
 
