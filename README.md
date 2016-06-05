@@ -204,7 +204,7 @@ $busQue->emptyQueue($queueName);
 Tests
 -----
 
-See the test suite output on Travis CI (if this isn't green now it usually is, honest!):
+See the test suite output on Travis CI:
 
 [![Build Status](https://travis-ci.org/mgdigital/BusQue.svg?branch=master)](https://travis-ci.org/mgdigital/BusQue)
 
