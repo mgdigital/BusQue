@@ -31,11 +31,10 @@ final class CommandHandler
         $baseCommand = $command->getCommand();
         $queueName = $this->implementation->getQueueNameResolver()
             ->resolveQueueName($baseCommand);
-        $commandId = $command->getId() ?:
-            $this->implementation->getCommandIdGenerator()
+        $commandId = $command->getId() ?: $this->implementation->getCommandIdGenerator()
                 ->generateId($baseCommand);
         $serialized = $this->implementation->getCommandSerializer()
             ->serialize($baseCommand);
-        return [$queueName, $commandId, $serialized];
+        return [ $queueName, $commandId, $serialized ];
     }
 }
