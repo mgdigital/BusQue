@@ -35,6 +35,8 @@ interface QueueAdapterInterface
 
     public function getQueuedIds(string $queueName, int $offset = 0, int $limit = 10): array;
 
+    public function getConsumingIds(string $queueName, int $offset = 0, int $limit = 10): array;
+
     /**
      * @param string $queueName
      * @param string $id

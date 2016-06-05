@@ -72,6 +72,11 @@ class BusQue
         return $this->implementation->getQueueAdapter()->getQueuedIds($queueName, $offset, $limit);
     }
 
+    public function listInProgressIds(string $queueName, int $offset = 0, int $limit = 10): array
+    {
+        return $this->implementation->getQueueAdapter()->getConsumingIds($queueName, $offset, $limit);
+    }
+
     public function getCommand(string $queueName, string $id)
     {
         $serialized = $this->implementation->getQueueAdapter()->readCommand($queueName, $id);

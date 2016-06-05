@@ -96,6 +96,14 @@ class BusQueSpec extends AbstractSpec
         $this->listQueuedIds('test_queue', 0, 10)->shouldReturn(['test_command_id']);
         $this->listQueuedIds('test_queue');
     }
+    
+    public function it_can_list_the_command_ids_in_progress()
+    {
+        $this->queueAdapter->getConsumingIds('test_queue', 0, 10)->willReturn(['test_command_id']);
+        $this->queueAdapter->getConsumingIds('test_queue', 0, 10)->shouldBeCalled();
+        $this->listInProgressIds('test_queue', 0, 10)->shouldReturn(['test_command_id']);
+        $this->listInProgressIds('test_queue');
+    }
 
     public function it_can_read_a_command_from_the_queue()
     {
