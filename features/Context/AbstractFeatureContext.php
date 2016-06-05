@@ -154,6 +154,16 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
     }
 
     /**
+     * @Then the command with ID :arg1 should resolve to :arg2
+     */
+    public function theCommandWithIdShouldResolveTo($arg1, $arg2)
+    {
+        $serialized = $this->implementation->getQueueAdapter()->readCommand('test_queue', $arg1);
+        $command = $this->implementation->getCommandSerializer()->unserialize($serialized);
+        \PHPUnit_Framework_Assert::assertEquals($command, $arg2);
+    }
+
+    /**
      * @Then I cancel :arg1
      */
     public function iCancel($arg1)

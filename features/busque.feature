@@ -19,6 +19,7 @@ Feature: Command Bus Queue
     Then "test_command_id" should be in the list of queued IDs
     And I queue "second_test_command" with ID "test_command_id"
     Then there should be 1 commands in the queue
+    And the command with ID "test_command_id" should resolve to "second_test_command"
     And I queue "third_test_command" with ID "another_command_id"
     Then there should be 2 commands in the queue
     And I run the queue worker
@@ -51,6 +52,7 @@ Feature: Command Bus Queue
   Scenario: Scheduling commands
     Given the queue is empty
     And I schedule "test_command" with ID "test_id" to run at 15:00
+    And I schedule "overwritten_test_command" with ID "test_id" to run at 14:00
     And I schedule "another_command" with ID "another_id" to run at 15:01
     And the time is 14:50
     Then the command with ID "test_id" should have a status of "scheduled"
@@ -64,7 +66,7 @@ Feature: Command Bus Queue
     And the command with ID "another_id" should have a status of "queued"
     When I run the queue worker
     And I run the queue worker
-    Then the command "test_command" should have run
+    Then the command "overwritten_test_command" should have run
     And the command "another_command" should have run
     And the command with ID "test_id" should have a status of "completed"
     And the command with ID "another_id" should have a status of "completed"
