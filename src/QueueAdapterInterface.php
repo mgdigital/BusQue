@@ -2,6 +2,7 @@
 
 namespace MGDigital\BusQue;
 
+use MGDigital\BusQue\Exception\CommandNotFoundException;
 use MGDigital\BusQue\Exception\TimeoutException;
 
 interface QueueAdapterInterface
@@ -31,6 +32,16 @@ interface QueueAdapterInterface
     public function putQueue(string $queueName);
 
     public function purgeCommand(string $queueName, string $id);
+
+    public function readQueuedIds(string $queueName, int $offset = 0, int $limit = 10): array;
+
+    /**
+     * @param string $queueName
+     * @param string $id
+     * @return string The serialized command
+     * @throws CommandNotFoundException
+     */
+    public function readCommand(string $queueName, string $id): string;
 
     /**
      * @param string $queueName

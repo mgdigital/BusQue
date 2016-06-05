@@ -3,6 +3,7 @@
 namespace MGDigital\BusQue\Predis;
 
 use MGDigital\BusQue\ClockInterface;
+use MGDigital\BusQue\Exception\CommandNotFoundException;
 use MGDigital\BusQue\Exception\TimeoutException;
 use MGDigital\BusQue\QueueAdapterInterface;
 use MGDigital\BusQue\ReceivedCommand;
@@ -63,12 +64,6 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         return new ReceivedCommand($queueName, $id, $serialized);
     }
 
-    public function getCommand(string $queueName, string $id): ReceivedCommand
-    {
-        $serialized = self::cRetrieveCommand($this->client, $queueName, $id);
-        return new ReceivedCommand($queueName, $id, $serialized);
-    }
-
     public function getCommandStatus(string $queueName, string $id): string
     {
         return $this->client->hget(":{$queueName}:command_status", $id) ?? self::STATUS_NOT_FOUND;
@@ -103,6 +98,20 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     public function getQueuedCount(string $queueName): int
     {
         return $this->client->llen(":{$queueName}:queue");
+    }
+
+    public function readQueuedIds(string $queueName, int $offset = 0, int $limit = 10): array
+    {
+        return $this->client->lrange(":{$queueName}:queue", $offset, $limit);
+    }
+
+    public function readCommand(string $queueName, string $id): string
+    {
+        $serialized = self::cRetrieveCommand($this->client, $queueName, $id);
+        if ($serialized === null) {
+            throw new CommandNotFoundException();
+        }
+        return $serialized;
     }
 
     public function emptyQueue(string $queueName)

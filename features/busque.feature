@@ -16,6 +16,7 @@ Feature: Command Bus Queue
   Scenario: Queuing commands with identifiers
     Given the queue is empty
     And I queue "test_command" with ID "test_command_id"
+    Then "test_command_id" should be in the list of queued IDs
     And I queue "second_test_command" with ID "test_command_id"
     Then there should be 1 commands in the queue
     And I queue "third_test_command" with ID "another_command_id"
@@ -45,6 +46,7 @@ Feature: Command Bus Queue
     Then there should be 1 commands in the queue
     And I cancel "test_command_id"
     Then there should be 0 commands in the queue
+    And the command should have a status of "not_found"
 
   Scenario: Scheduling a command
     Given the queue is empty
@@ -70,3 +72,4 @@ Feature: Command Bus Queue
     And the time is 15:01
     And I run the scheduler worker
     Then there should be 0 commands in the queue
+    And the command should have a status of "not_found"

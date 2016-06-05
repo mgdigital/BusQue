@@ -89,4 +89,22 @@ class BusQueSpec extends AbstractSpec
         $this->listQueues();
     }
 
+    public function it_can_list_the_command_ids_in_a_queue()
+    {
+        $this->queueAdapter->readQueuedIds('test_queue', 0, 10)->willReturn(['test_command_id']);
+        $this->queueAdapter->readQueuedIds('test_queue', 0, 10)->shouldBeCalled();
+        $this->listQueuedIds('test_queue', 0, 10)->shouldReturn(['test_command_id']);
+        $this->listQueuedIds('test_queue');
+    }
+
+    public function it_can_read_a_command_from_the_queue()
+    {
+        $this->queueAdapter->readCommand('test_queue', 'test_command_id')->willReturn('serialized');
+        $this->commandSerializer->unserialize('serialized')->willReturn('test_command');
+        $this->queueAdapter->readCommand('test_queue', 'test_command_id')->shouldBeCalled();
+        $this->commandSerializer->unserialize('serialized')->shouldBeCalled();
+        $this->getCommand('test_queue', 'test_command_id')->shouldReturn('test_command');
+        $this->getCommand('test_queue', 'test_command_id');
+    }
+
 }

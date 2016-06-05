@@ -67,6 +67,17 @@ class BusQue
         return $this->implementation->getQueueAdapter()->getQueueNames();
     }
 
+    public function listQueuedIds(string $queueName, int $offset = 0, int $limit = 10): array
+    {
+        return $this->implementation->getQueueAdapter()->readQueuedIds($queueName, $offset, $limit);
+    }
+
+    public function getCommand(string $queueName, string $id)
+    {
+        $serialized = $this->implementation->getQueueAdapter()->readCommand($queueName, $id);
+        return $this->unserializeCommand($serialized);
+    }
+
     public function workQueue(string $queueName, int $n = null, int $time = null)
     {
         (new QueueWorker($this->implementation))->work($queueName, $n, $time);
