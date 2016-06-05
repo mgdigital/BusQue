@@ -26,7 +26,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     public function queueCommand(string $queueName, string $id, string $serialized)
     {
         if (!$this->storeCommandAndCheckReservationStatus($queueName, $id, $serialized)) {
-            $this->client->pipeline(function(ClientContextInterface $client) use ($queueName, $id) {
+            $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id) {
                 self::cReserveCommandId($client, $queueName, $id);
                 self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_QUEUED);
                 $client->lpush(":{$queueName}:queue", [ $id ]);
@@ -53,7 +53,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             return $this->awaitCommand($queueName, $timeout);
         }
         /* @var $id string */
-        list(, $serialized) = $this->client->pipeline(function(ClientContextInterface $client) use ($queueName, $id) {
+        list(, $serialized) = $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id) {
             self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_IN_PROGRESS);
             self::cRetrieveCommand($client, $queueName, $id);
             self::cReleaseReservedCommandIds($client, $queueName, [ $id ]);
@@ -68,21 +68,21 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function setCommandCompleted(string $queueName, string $id)
     {
-        $this->client->pipeline(function(ClientContextInterface $client) use ($queueName, $id) {
+        $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id) {
             self::cEndCommand($client, $queueName, $id, self::STATUS_COMPLETED);
         });
     }
 
     public function setCommandFailed(string $queueName, string $id)
     {
-        $this->client->pipeline(function(ClientContextInterface $client) use ($queueName, $id) {
+        $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id) {
             self::cEndCommand($client, $queueName, $id, self::STATUS_FAILED);
         });
     }
 
     public function putQueue(string $queueName)
     {
-        $this->client->pipeline(function(ClientContextInterface $client) use ($queueName) {
+        $this->client->pipeline(function (ClientContextInterface $client) use ($queueName) {
             self::cAddQueue($client, $queueName);
         });
     }
@@ -128,14 +128,14 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function deleteQueue(string $queueName)
     {
-        $this->client->pipeline(function(ClientContextInterface $client) use ($queueName) {
+        $this->client->pipeline(function (ClientContextInterface $client) use ($queueName) {
             self::cDeleteQueue($client, $queueName);
         });
     }
 
     public function purgeCommand(string $queueName, string $id)
     {
-        $this->client->pipeline(function(ClientContextInterface $client) use ($queueName, $id) {
+        $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id) {
             $client->hdel(":{$queueName}:command_store", [ $id ]);
             $client->hdel(":{$queueName}:command_status", [ $id ]);
             self::cReleaseReservedCommandIds($client, $queueName, [ $id ]);
@@ -150,7 +150,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     {
         if (!$this->storeCommandAndCheckReservationStatus($queueName, $id, $serialized)) {
             $this->client->pipeline(
-                function(ClientContextInterface $client) use ($queueName, $id, $dateTime) {
+                function (ClientContextInterface $client) use ($queueName, $id, $dateTime) {
                     self::cReserveCommandId($client, $queueName, $id);
                     self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_SCHEDULED);
                     $json = json_encode([ $queueName, $id ]);
@@ -175,7 +175,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         foreach ($queueNames as $queueName) {
             $result = $this->client->zrangebyscore(':schedule', $lowScore, $highScore);
             if (!empty($result)) {
-                $this->client->pipeline(function(ClientContextInterface $client) use ($result, $queueName) {
+                $this->client->pipeline(function (ClientContextInterface $client) use ($result, $queueName) {
                     $idsToRelease = [ ];
                     foreach ($result as $json => $score) {
                         list($thisQueueName, $id) = json_decode($json, true);
@@ -208,7 +208,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         if ($result !== [ ]) {
             $queueNamesById = $idsByJson = [ ];
             $pipelineReturn = $this->client->pipeline(
-                function(ClientContextInterface $client) use ($result, &$queueNamesById, &$idsByJson) {
+                function (ClientContextInterface $client) use ($result, &$queueNamesById, &$idsByJson) {
                     $idsByQueueName = [ ];
                     foreach ($result as $json => $score) {
                         list($queueName, $id) = json_decode($json, true);
@@ -239,7 +239,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     private function storeCommandAndCheckReservationStatus(string $queueName, string $id, string $serialized): bool
     {
         list ($isReserved) = $this->client->pipeline(
-            function(ClientContextInterface $client) use ($queueName, $id, $serialized) {
+            function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
                 self::cIsCommandIdReserved($client, $queueName, $id);
                 self::cStoreCommand($client, $queueName, $id, $serialized);
             }
