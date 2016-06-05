@@ -57,7 +57,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         list(, $serialized) = $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id) {
             self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_IN_PROGRESS);
             self::cRetrieveCommand($client, $queueName, $id);
-            self::cReleaseReservedCommandId($client, $queueName, $id);
+            self::cReleaseReservedCommandIds($client, $queueName, [$id]);
         });
         return new ReceivedCommand($queueName, $id, $serialized);
     }
@@ -139,7 +139,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id) {
             $client->hdel(":{$queueName}:command_store", [$id]);
             $client->hdel(":{$queueName}:command_status", [$id]);
-            self::cReleaseReservedCommandId($client, $queueName, $id);
+            self::cReleaseReservedCommandIds($client, $queueName, [$id]);
             $json = json_encode([$queueName, $id]);
             $client->lrem(":{$queueName}:queue", 1, $id);
             $client->lrem(":{$queueName}:consuming", 1, $id);
@@ -178,13 +178,15 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             $result = $this->client->zrangebyscore(':schedule', $lowScore, $highScore);
             if (!empty($result)) {
                 $this->client->pipeline(function (ClientContextInterface $client) use ($result, $queueName) {
+                    $idsToRelease = [];
                     foreach ($result as $json => $score) {
                         list($thisQueueName, $id) = json_decode($json, true);
                         if ($thisQueueName === $queueName) {
                             $client->zrem(':schedule', $json);
-                            self::cReleaseReservedCommandId($client, $queueName, $id);
+                            $idsToRelease[] = $id;
                         }
                     }
+                    self::cReleaseReservedCommandIds($client, $queueName, $idsToRelease);
                 });
             }
         }
@@ -209,15 +211,17 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             $queueNamesById = $idsByJson = [];
             $pipelineReturn = $this->client->pipeline(
                 function (ClientContextInterface $client) use (&$result, &$queueNamesById, &$idsByJson) {
+                    $idsByQueueName = [];
                     foreach ($result as $json => $score) {
                         list($queueName, $id) = json_decode($json, true);
+                        $idsByQueueName[$queueName][] = $id;
                         $queueNamesById[$id] = $queueName;
                         $idsByJson[$json] = $id;
                         self::cRetrieveCommand($client, $queueName, $id);
                     }
                     $client->zrem(':schedule', ...array_keys($result));
-                    foreach ($queueNamesById as $id => $queueName) {
-                        self::cReleaseReservedCommandId($client, $queueName, $id);
+                    foreach ($idsByQueueName as $queueName => $ids) {
+                        self::cReleaseReservedCommandIds($client, $queueName, $ids);
                     }
 
                 }
@@ -254,14 +258,14 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     private static function cEndCommand($client, string $queueName, string $id, string $status)
     {
         self::cUpdateCommandStatus($client, $queueName, $id, $status);
-        self::cReleaseReservedCommandId($client, $queueName, $id);
+        self::cReleaseReservedCommandIds($client, $queueName, [$id]);
         $client->srem(":{$queueName}:queue_ids", [$id]);
         $client->lrem(":{$queueName}:consuming", 1, $id);
     }
 
-    private static function cReleaseReservedCommandId($client, string $queueName, string $id)
+    private static function cReleaseReservedCommandIds($client, string $queueName, array $ids)
     {
-        $client->srem(":{$queueName}:queue_ids", [$id]);
+        $client->srem(":{$queueName}:queue_ids", $ids);
     }
 
     private static function cIsCommandIdReserved($client, string $queueName, string $id)
