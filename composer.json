@@ -1,5 +1,6 @@
 {
     "name": "mgdigital/busque",
+    "description": "A flexible, modern command queue and scheduler for PHP7, built on Redis",
     "autoload": {
         "psr-4": {
             "MGDigital\\BusQue\\": "src",
