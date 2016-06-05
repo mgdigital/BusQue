@@ -2,3 +2,10 @@ suites:
     busque:
         namespace: MGDigital\BusQue
         psr4_prefix: MGDigital\BusQue
+code_coverage:
+      format:
+          - clover
+      output:
+          clover: coverage.xml
+extensions:
+    - PhpSpec\Extension\CodeCoverageExtension

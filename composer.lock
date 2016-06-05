@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "53fe7af810de6bf7568915037ab68226",
-    "content-hash": "941d2552b4b7322755f492298f7114fc",
+    "hash": "b442ae4755f3ebbc50c5f1343119d55c",
+    "content-hash": "22baabff55a49b0c6d78ad79a941c1cc",
     "packages": [
         {
             "name": "league/tactician",
@@ -379,6 +379,49 @@
                 "instantiate"
             ],
             "time": "2015-06-14 21:17:01"
+        },
+        {
+            "name": "henrikbjorn/phpspec-code-coverage",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/henrikbjorn/PhpSpecCodeCoverageExtension.git",
+                "reference": "528a0c69a524f8acba5f66bc59ae8dc9bc409045"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/henrikbjorn/PhpSpecCodeCoverageExtension/zipball/528a0c69a524f8acba5f66bc59ae8dc9bc409045",
+                "reference": "528a0c69a524f8acba5f66bc59ae8dc9bc409045",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.3|^5.4|^5.5|^5.6|^7.0",
+                "phpspec/phpspec": "^2.0",
+                "phpunit/php-code-coverage": "^2.2.4|^3"
+            },
+            "require-dev": {
+                "bossa/phpspec2-expect": "^1.0"
+            },
+            "suggest": {
+                "ext-xdebug": "To allow coverage generation when not using a recent version of phpdbg"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PhpSpec\\Extension\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Integrates CodeCoverage with PhpSpec",
+            "time": "2016-05-05 18:25:12"
         },
         {
             "name": "phpdocumentor/reflection-docblock",
