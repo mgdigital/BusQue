@@ -52,7 +52,6 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             }
             return $this->awaitCommand($queueName, $timeout);
         }
-        /* @var $queueName string */
         /* @var $id string */
         list(, $serialized) = $this->client->pipeline(function (ClientContextInterface $client) use ($queueName, $id) {
             self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_IN_PROGRESS);
