@@ -6,7 +6,7 @@ use MGDigital\BusQue\BusQue;
 use MGDigital\BusQue\QueuedCommand;
 use MGDigital\BusQue\ScheduledCommand;
 
-class BusQueSpec extends AbstractSpec
+final class BusQueSpec extends AbstractSpec
 {
 
     public function it_is_initializable()
@@ -67,6 +67,13 @@ class BusQueSpec extends AbstractSpec
         $this->queueAdapter->getQueuedCount('test_queue')->willReturn(10);
         $this->getQueuedCount('test_queue')->shouldReturn(10);
         $this->getQueuedCount('test_queue');
+    }
+
+    public function it_can_get_the_number_of_in_progress_commands_for_a_queue()
+    {
+        $this->queueAdapter->getConsumingCount('test_queue')->willReturn(2);
+        $this->getInProgressCount('test_queue')->shouldReturn(2);
+        $this->getInProgressCount('test_queue');
     }
 
     public function it_can_purge_a_command()

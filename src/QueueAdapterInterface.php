@@ -27,6 +27,8 @@ interface QueueAdapterInterface
 
     public function getQueuedCount(string $queueName): int;
 
+    public function getConsumingCount(string $queueName): int;
+
     public function emptyQueue(string $queueName);
 
     public function putQueue(string $queueName);

@@ -105,6 +105,11 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         return $this->client->lrange(":{$queueName}:queue", $offset, $limit);
     }
 
+    public function getConsumingCount(string $queueName): int
+    {
+        return $this->client->llen(":{$queueName}:consuming");
+    }
+
     public function getConsumingIds(string $queueName, int $offset = 0, int $limit = 10): array
     {
         return $this->client->lrange(":{$queueName}:consuming", $offset, $limit);
