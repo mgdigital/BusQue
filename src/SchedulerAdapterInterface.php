@@ -12,10 +12,10 @@ interface SchedulerAdapterInterface
     public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null);
 
     /**
-     * @param ClockInterface $clock
-     * @param int $n The maximum number of scheduled commands to return.
-     * @param int $timeout If no scheduled command is encountered before timeout then an empty array should be returned.
+     * @param \DateTime $now
+     * @param int $limit The maximum number of scheduled commands to return.
+     * @param \DateTime|null $startTime Return due commands since $startTime or the beginning of time.
      * @return ReceivedScheduledCommand[]
      */
-    public function awaitScheduledCommands(ClockInterface $clock, int $n = null, int $timeout = null): array;
+    public function receiveDueCommands(\DateTime $now, int $limit = 100, \DateTime $startTime = null): array;
 }

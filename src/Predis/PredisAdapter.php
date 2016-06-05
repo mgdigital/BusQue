@@ -2,7 +2,6 @@
 
 namespace MGDigital\BusQue\Predis;
 
-use MGDigital\BusQue\ClockInterface;
 use MGDigital\BusQue\Exception\CommandNotFoundException;
 use MGDigital\BusQue\Exception\TimeoutException;
 use MGDigital\BusQue\QueueAdapterInterface;
@@ -193,52 +192,31 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         }
     }
 
-    public function awaitScheduledCommands(
-        ClockInterface $clock,
-        int $n = null,
-        int $timeout = null,
-        \DateInterval $expiry = null
-    ): array {
-        $stopwatchStart = time();
-        while (true) {
-            $currentTime = $clock->getTime();
-            if ($expiry === null) {
-                $start = 0;
-            } else {
-                $startTime = clone $currentTime;
-                $startTime = $startTime->sub($expiry);
-                $start = $startTime->getTimestamp();
-            }
-            $result = $this->client->zrangebyscore(':schedule', $start, $currentTime->getTimestamp(), [
-                'limit' => [0, $n ?? 100],
-                'withscores' => true,
-            ]);
-            $commands = [];
-            foreach ($result as $json => $score) {
-                list($queueName, $id) = json_decode($json, true);
-                $dateTime = new \DateTime("@{$score}");
-                list(, $serialized) = $this->client->pipeline(
-                    function (ClientContextInterface $client) use ($json, $queueName, $id) {
-                        $client->zrem(':schedule', $json);
-                        self::cRetrieveCommand($client, $queueName, $id);
-                        self::cReleaseReservedCommandId($client, $queueName, $id);
-                    }
-                );
-                $commands[] = new ReceivedScheduledCommand($queueName, $id, $serialized, $dateTime);
-            }
-            if ($commands !== []) {
-                return $commands;
-            }
-            if ($timeout !== null) {
-                if ((time() - $stopwatchStart) >= $timeout) {
-                    return [];
-                }
-                $sleepTime = min($timeout, $this->schedulerDelay);
-            } else {
-                $sleepTime = $this->schedulerDelay;
-            }
-            usleep($sleepTime * 1000000);
+    public function receiveDueCommands(\DateTime $now, int $limit = 100, \DateTime $startTime = null): array
+    {
+        if ($startTime === null) {
+            $start = 0;
+        } else {
+            $start = $startTime->getTimestamp();
         }
+        $result = $this->client->zrangebyscore(':schedule', $start, $now->getTimestamp(), [
+            'limit' => [0, $limit],
+            'withscores' => true,
+        ]);
+        $commands = [];
+        foreach ($result as $json => $score) {
+            list($queueName, $id) = json_decode($json, true);
+            $dateTime = new \DateTime("@{$score}");
+            list(, $serialized) = $this->client->pipeline(
+                function (ClientContextInterface $client) use ($json, $queueName, $id) {
+                    $client->zrem(':schedule', $json);
+                    self::cRetrieveCommand($client, $queueName, $id);
+                    self::cReleaseReservedCommandId($client, $queueName, $id);
+                }
+            );
+            $commands[] = new ReceivedScheduledCommand($queueName, $id, $serialized, $dateTime);
+        }
+        return $commands;
     }
 
     private static function cStoreCommand($client, string $queueName, string $id, string $serialized)

@@ -12,12 +12,25 @@ class SchedulerWorker
         $this->implementation = $implementation;
     }
 
-    public function work(int $n = null, int $time = null)
+    /**
+     * @param int|null $limit The maximum number of commands to schedule.
+     * @param int|null $time The maximum amount of time in seconds to work.
+     * @param int $uSleepTime The number of microseconds to usleep between each query to the scheduler.
+     * @param \DateInterval|null $expiry The expiry interval for an overdue unqueued command.
+     */
+    public function work(int $limit = null, int $time = null, int $uSleepTime = 5000000, \DateInterval $expiry = null)
     {
         $stopwatchStart = time();
-        while ($n === null || $n > 0) {
+        while ($limit === null || $limit > 0) {
+            $now = $this->implementation->getClock()->getTime();
+            if ($expiry === null) {
+                $start = null;
+            } else {
+                $start = clone $now;
+                $start = $start->sub($expiry);
+            }
             $receivedCommands = $this->implementation->getSchedulerAdapter()
-                ->awaitScheduledCommands($this->implementation->getClock(), $n, $time);
+                ->receiveDueCommands($now, $limit, $start);
             foreach ($receivedCommands as $received) {
                 $this->implementation->getQueueAdapter()
                     ->queueCommand(
@@ -25,13 +38,14 @@ class SchedulerWorker
                         $received->getId(),
                         $received->getSerialized()
                     );
-                if ($n !== null) {
-                    $n--;
+                if ($limit !== null) {
+                    $limit--;
                 }
             }
-            if ($time !== null && (time() - $stopwatchStart >= $time)) {
+            if ($limit <= 0 || ($time !== null && (time() - $stopwatchStart >= $time))) {
                 break;
             }
+            usleep($uSleepTime);
         }
     }
 }

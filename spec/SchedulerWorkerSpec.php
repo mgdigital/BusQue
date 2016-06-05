@@ -4,6 +4,7 @@ namespace spec\MGDigital\BusQue;
 
 use MGDigital\BusQue\ReceivedScheduledCommand;
 use MGDigital\BusQue\SchedulerWorker;
+use Prophecy\Argument;
 
 final class SchedulerWorkerSpec extends AbstractSpec
 {
@@ -17,9 +18,10 @@ final class SchedulerWorkerSpec extends AbstractSpec
     {
         $dateTime = new \DateTime();
         $scheduledCommand = new ReceivedScheduledCommand('test_queue', 'test_id', 'serialized', $dateTime);
-        $this->schedulerAdapter->awaitScheduledCommands($this->clock, 1, null)->willReturn([$scheduledCommand]);
+        $this->clock->getTime()->willReturn($dateTime);
+        $this->schedulerAdapter->receiveDueCommands($dateTime, 1, null, null)->willReturn([$scheduledCommand]);
         $this->queueAdapter->queueCommand('test_queue', 'test_id', 'serialized')->shouldBeCalled();
-        $this->work(1);
+        $this->work(1, 1, 0);
     }
 
 }

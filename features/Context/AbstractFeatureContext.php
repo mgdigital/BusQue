@@ -183,7 +183,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
     {
         $worker = new SchedulerWorker($this->implementation);
         try {
-            $worker->work(1, 1);
+            $worker->work(1, 1, 0);
         } catch (TimeoutException $e) {}
     }
 }
