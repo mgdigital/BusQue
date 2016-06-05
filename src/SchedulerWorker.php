@@ -42,7 +42,7 @@ class SchedulerWorker
                     $limit--;
                 }
             }
-            if ($limit <= 0 || ($time !== null && (time() - $stopwatchStart >= $time))) {
+            if (($limit !== null && $limit <= 0) || ($time !== null && (time() - $stopwatchStart >= $time))) {
                 break;
             }
             usleep($uSleepTime);
