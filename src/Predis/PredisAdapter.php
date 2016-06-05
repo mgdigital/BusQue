@@ -210,7 +210,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         if ($result !== []) {
             $queueNamesById = $idsByJson = [];
             $pipelineReturn = $this->client->pipeline(
-                function (ClientContextInterface $client) use (&$result, &$queueNamesById, &$idsByJson) {
+                function (ClientContextInterface $client) use ($result, &$queueNamesById, &$idsByJson) {
                     $idsByQueueName = [];
                     foreach ($result as $json => $score) {
                         list($queueName, $id) = json_decode($json, true);
