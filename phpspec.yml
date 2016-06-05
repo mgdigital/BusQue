@@ -1,3 +1,4 @@
 suites:
     busque:
         namespace: MGDigital\BusQue
+        psr4_prefix: MGDigital\BusQue

@@ -3,7 +3,8 @@
     "autoload": {
         "psr-4": {
             "MGDigital\\BusQue\\": "src",
-            "MGDigital\\BusQue\\Features\\": "features"
+            "MGDigital\\BusQue\\Features\\": "features",
+            "spec\\MGDigital\\BusQue\\": "spec"
         }
     },
     "require": {
