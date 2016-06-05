@@ -97,7 +97,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function shouldBeInTheListOfQueuedIds($arg1)
     {
-        $queuedIds = $this->implementation->getQueueAdapter()->readQueuedIds('test_queue');
+        $queuedIds = $this->implementation->getQueueAdapter()->getQueuedIds('test_queue');
         \PHPUnit_Framework_Assert::assertTrue(in_array($arg1, $queuedIds));
     }
 

@@ -69,7 +69,7 @@ class BusQue
 
     public function listQueuedIds(string $queueName, int $offset = 0, int $limit = 10): array
     {
-        return $this->implementation->getQueueAdapter()->readQueuedIds($queueName, $offset, $limit);
+        return $this->implementation->getQueueAdapter()->getQueuedIds($queueName, $offset, $limit);
     }
 
     public function getCommand(string $queueName, string $id)

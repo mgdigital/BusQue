@@ -33,7 +33,7 @@ interface QueueAdapterInterface
 
     public function purgeCommand(string $queueName, string $id);
 
-    public function readQueuedIds(string $queueName, int $offset = 0, int $limit = 10): array;
+    public function getQueuedIds(string $queueName, int $offset = 0, int $limit = 10): array;
 
     /**
      * @param string $queueName

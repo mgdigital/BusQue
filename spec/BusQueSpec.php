@@ -91,8 +91,8 @@ class BusQueSpec extends AbstractSpec
 
     public function it_can_list_the_command_ids_in_a_queue()
     {
-        $this->queueAdapter->readQueuedIds('test_queue', 0, 10)->willReturn(['test_command_id']);
-        $this->queueAdapter->readQueuedIds('test_queue', 0, 10)->shouldBeCalled();
+        $this->queueAdapter->getQueuedIds('test_queue', 0, 10)->willReturn(['test_command_id']);
+        $this->queueAdapter->getQueuedIds('test_queue', 0, 10)->shouldBeCalled();
         $this->listQueuedIds('test_queue', 0, 10)->shouldReturn(['test_command_id']);
         $this->listQueuedIds('test_queue');
     }
