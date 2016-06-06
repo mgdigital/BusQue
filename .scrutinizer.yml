@@ -11,6 +11,13 @@ build:
                     format: 'clover'
 checks:
     php: true
+coding_style:
+    php:
+        spaces:
+            before_parentheses:
+                function_declaration: true
+            within:
+                brackets: true
 filter:
     excluded_paths:
         - features/*
