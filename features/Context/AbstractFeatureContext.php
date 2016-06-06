@@ -55,6 +55,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
             $implementation->getQueueAdapter(),
             $implementation->getSchedulerAdapter(),
             $this->clock->reveal(),
+            $implementation->getCommandBusAdapter(),
             new LoggingErrorHandler(new NullLogger())
         );
     }
