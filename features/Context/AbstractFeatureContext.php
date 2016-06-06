@@ -9,6 +9,7 @@ use MGDigital\BusQue\CommandHandler;
 use MGDigital\BusQue\CommandIdGeneratorInterface;
 use MGDigital\BusQue\Exception\TimeoutException;
 use MGDigital\BusQue\Implementation;
+use MGDigital\BusQue\Logging\LoggingErrorHandler;
 use MGDigital\BusQue\QueuedCommand;
 use MGDigital\BusQue\QueueNameResolverInterface;
 use MGDigital\BusQue\QueueWorker;
@@ -16,6 +17,7 @@ use MGDigital\BusQue\ScheduledCommand;
 use MGDigital\BusQue\SchedulerWorker;
 use Prophecy\Argument;
 use Prophecy\Prophet;
+use Psr\Log\NullLogger;
 
 abstract class AbstractFeatureContext implements SnippetAcceptingContext
 {
@@ -45,11 +47,16 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
         $this->queueNameResolver = $this->prophet->prophesize(QueueNameResolverInterface::class);
         $this->queueNameResolver->resolveQueueName(Argument::any())->willReturn('test_queue');
         $this->clock = $this->prophet->prophesize(ClockInterface::class);
-        $this->implementation = $this->getImplementation()
-            ->setCommandBusAdapter($this->commandBus->reveal())
-            ->setCommandIdGenerator($this->commandIdGenerator->reveal())
-            ->setQueueNameResolver($this->queueNameResolver->reveal())
-            ->setClock($this->clock->reveal());
+        $implementation = $this->getImplementation();
+        $this->implementation = new Implementation(
+            $this->queueNameResolver->reveal(),
+            $implementation->getCommandSerializer(),
+            $this->commandIdGenerator->reveal(),
+            $implementation->getQueueAdapter(),
+            $implementation->getSchedulerAdapter(),
+            $this->clock->reveal(),
+            new LoggingErrorHandler(new NullLogger())
+        );
     }
 
     /**
