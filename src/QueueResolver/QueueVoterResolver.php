@@ -11,22 +11,22 @@ class QueueVoterResolver implements QueueResolverInterface
     /**
      * @var QueueVoterInterface[]
      */
-    private $voters = [];
+    private $voters = [ ];
 
     public function __construct(array $voters)
     {
         array_walk($voters, function (QueueVoterInterface $voter) {
-            $this->voters[] = $voter;
+            $this->voters[ ] = $voter;
         });
     }
 
     public function resolveQueueName($command): string
     {
         $votes = $this->getVotes($command);
-        if (!isset($votes[0])) {
+        if (!isset($votes[ 0 ])) {
             throw new QueueResolverException;
         }
-        return $votes[0]->getQueueName();
+        return $votes[ 0 ]->getQueueName();
     }
 
     /**
@@ -35,11 +35,11 @@ class QueueVoterResolver implements QueueResolverInterface
      */
     public function getVotes($command): array
     {
-        $votes = [];
+        $votes = [ ];
         foreach ($this->voters as $voter) {
             $vote = $voter->getVote($command);
             if ($vote instanceof QueueVote) {
-                $votes[] = $vote;
+                $votes[ ] = $vote;
             }
         }
         usort($votes, function (QueueVote $voteA, QueueVote $voteB) {

@@ -15,10 +15,10 @@ class QueueVoterWithWhitelistResolver extends QueueVoterResolver
 
     public function getVotes($command): array
     {
-        $votes = [];
+        $votes = [ ];
         foreach (parent::getVotes($command) as $vote) {
             if (in_array($vote->getQueueName(), $this->whitelist, true)) {
-                $votes[] = $vote;
+                $votes[ ] = $vote;
             }
         }
         return $votes;
