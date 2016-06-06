@@ -5,9 +5,10 @@ namespace MGDigital\BusQue\Features\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use MGDigital\BusQue\ClockInterface;
 use MGDigital\BusQue\CommandBusAdapterInterface;
-use MGDigital\BusQue\CommandHandler;
 use MGDigital\BusQue\CommandIdGeneratorInterface;
 use MGDigital\BusQue\Exception\TimeoutException;
+use MGDigital\BusQue\Handler\QueuedCommandHandler;
+use MGDigital\BusQue\Handler\ScheduledCommandHandler;
 use MGDigital\BusQue\Implementation;
 use MGDigital\BusQue\Logging\LoggingErrorHandler;
 use MGDigital\BusQue\QueuedCommand;
@@ -96,8 +97,8 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
 
     protected function queueCommand($command, string $id = null)
     {
-        $handler = new CommandHandler($this->implementation);
-        $handler->handleQueued(new QueuedCommand($command, $id ?? 'test_command_id'));
+        $handler = new QueuedCommandHandler($this->implementation);
+        $handler->handleQueuedCommand(new QueuedCommand($command, $id ?? 'test_command_id'));
     }
 
     /**
@@ -198,8 +199,8 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
 
     protected function scheduleCommand($command, \DateTime $dateTime, string $id)
     {
-        $hander = new CommandHandler($this->implementation);
-        $hander->handleScheduled(new ScheduledCommand($command, $dateTime, $id));
+        $hander = new ScheduledCommandHandler($this->implementation);
+        $hander->handleScheduledCommand(new ScheduledCommand($command, $dateTime, $id));
     }
 
     /**
