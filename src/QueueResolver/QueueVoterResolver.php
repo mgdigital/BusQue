@@ -23,7 +23,7 @@ class QueueVoterResolver implements QueueResolverInterface
     public function resolveQueueName($command): string
     {
         $votes = $this->getVotes($command);
-        if ($votes === []) {
+        if (!isset($votes[0])) {
             throw new QueueResolverException;
         }
         return $votes[0]->getQueueName();
