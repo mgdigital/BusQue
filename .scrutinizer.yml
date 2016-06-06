@@ -15,7 +15,7 @@ coding_style:
     php:
         spaces:
             before_parentheses:
-                function_declaration: true
+                closure_definition: true
             within:
                 brackets: true
 filter:
