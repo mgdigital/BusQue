@@ -3,7 +3,7 @@
 namespace MGDigital\BusQue\Features\Context;
 
 use League\Tactician\CommandBus;
-use MGDigital\BusQue\ClassNameQueueNameResolver;
+use MGDigital\BusQue\QueueResolver\ClassNameQueueResolver;
 use MGDigital\BusQue\IdGenerator\ObjectHashIdGenerator;
 use MGDigital\BusQue\Implementation;
 use MGDigital\BusQue\Logging\LoggingErrorHandler;
@@ -20,7 +20,7 @@ abstract class AbstractQueueAndSchedulerContext extends AbstractFeatureContext
     protected function getImplementation(): Implementation
     {
         return new Implementation(
-            new ClassNameQueueNameResolver(),
+            new ClassNameQueueResolver(),
             new PHPCommandSerializer(),
             new ObjectHashIdGenerator(),
             $this->getQueueAdapter(),

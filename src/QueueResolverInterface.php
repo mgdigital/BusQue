@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue;
 
-interface QueueNameResolverInterface
+interface QueueResolverInterface
 {
 
     public function resolveQueueName($command): string;

@@ -42,7 +42,7 @@ $predisAdapter = new BusQue\Predis\PredisAdapter(new Predis\Client());
 
 $implementation = new BusQue\Implementation(
     // Results in queues named by the command classname, backslashes replaced with underscores:
-    new BusQue\ClassNameQueueNameResolver(),
+    new BusQue\QueueResolver\ClassNameQueueResolver(),
     // You might want to replace this with a more advanced serializer: 
     new BusQue\Serializer\PHPCommandSerializer(),
     // Commands without an explicit ID will have spl_object_hash() performed to generate the ID:
@@ -172,7 +172,7 @@ echo $busQue->getQueuedCount($queueName); // 0
 
 ### Listing queues
 
-Queues are created automatically if they don't exist, using whichever queue name is returned from the `QueueNameResolverInterface` adapter. A worker can work on a queue which doesn't exist yet. You need to make sure that if a new queue name is generated, there is a worker to receive the commands in that queue.
+Queues are created automatically if they don't exist, using whichever queue name is returned from the `QueueResolverInterface` adapter. A worker can work on a queue which doesn't exist yet. You need to make sure that if a new queue name is generated, there is a worker to receive the commands in that queue.
 
 ```php
 <?php

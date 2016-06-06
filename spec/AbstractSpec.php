@@ -9,7 +9,7 @@ use MGDigital\BusQue\CommandSerializerInterface;
 use MGDigital\BusQue\ErrorHandlerInterface;
 use MGDigital\BusQue\Implementation;
 use MGDigital\BusQue\QueueAdapterInterface;
-use MGDigital\BusQue\QueueNameResolverInterface;
+use MGDigital\BusQue\QueueResolverInterface;
 use MGDigital\BusQue\SchedulerAdapterInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -17,7 +17,7 @@ use Prophecy\Argument;
 abstract class AbstractSpec extends ObjectBehavior
 {
 
-    protected $queueNameResolver;
+    protected $queueResolver;
     protected $commandSerializer;
     protected $commandIdGenerator;
     protected $queueAdapter;
@@ -28,7 +28,7 @@ abstract class AbstractSpec extends ObjectBehavior
     protected $implementation;
 
     public function let(
-        $queueNameResolver,
+        $queueResolver,
         $commandSerializer,
         $commandIdGenerator,
         $queueAdapter,
@@ -39,8 +39,8 @@ abstract class AbstractSpec extends ObjectBehavior
         $implementation
     ) {
 
-        $queueNameResolver->beADoubleOf(QueueNameResolverInterface::class);
-        $queueNameResolver->resolveQueueName(Argument::any())->willReturn('test_queue');
+        $queueResolver->beADoubleOf(QueueResolverInterface::class);
+        $queueResolver->resolveQueueName(Argument::any())->willReturn('test_queue');
 
         $commandSerializer->beADoubleOf(CommandSerializerInterface::class);
         $commandSerializer->serialize(Argument::any())->willReturn('serialized');
@@ -59,7 +59,7 @@ abstract class AbstractSpec extends ObjectBehavior
         $errorHandler->beADoubleOf(ErrorHandlerInterface::class);
 
         $implementation->beADoubleOf(Implementation::class);
-        $implementation->getQueueNameResolver()->willReturn($queueNameResolver);
+        $implementation->getQueueResolver()->willReturn($queueResolver);
         $implementation->getCommandSerializer()->willReturn($commandSerializer);
         $implementation->getCommandIdGenerator()->willReturn($commandIdGenerator);
         $implementation->getQueueAdapter()->willReturn($queueAdapter);
@@ -68,7 +68,7 @@ abstract class AbstractSpec extends ObjectBehavior
         $implementation->getCommandBusAdapter()->willReturn($commandBusAdapter);
         $implementation->getErrorHandler()->willReturn($errorHandler);
 
-        $this->queueNameResolver = $queueNameResolver;
+        $this->queueResolver = $queueResolver;
         $this->commandSerializer = $commandSerializer;
         $this->commandIdGenerator = $commandIdGenerator;
         $this->queueAdapter = $queueAdapter;

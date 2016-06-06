@@ -11,7 +11,7 @@ use MGDigital\BusQue\Exception\TimeoutException;
 use MGDigital\BusQue\Implementation;
 use MGDigital\BusQue\Logging\LoggingErrorHandler;
 use MGDigital\BusQue\QueuedCommand;
-use MGDigital\BusQue\QueueNameResolverInterface;
+use MGDigital\BusQue\QueueResolverInterface;
 use MGDigital\BusQue\QueueWorker;
 use MGDigital\BusQue\ScheduledCommand;
 use MGDigital\BusQue\SchedulerWorker;
@@ -44,7 +44,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
         $this->commandBus = $this->prophet->prophesize(CommandBusAdapterInterface::class);
         $this->commandIdGenerator = $this->prophet->prophesize(CommandIdGeneratorInterface::class);
         $this->commandIdGenerator->generateId(Argument::any())->willReturn('test_command_id');
-        $this->queueNameResolver = $this->prophet->prophesize(QueueNameResolverInterface::class);
+        $this->queueNameResolver = $this->prophet->prophesize(QueueResolverInterface::class);
         $this->queueNameResolver->resolveQueueName(Argument::any())->willReturn('test_queue');
         $this->clock = $this->prophet->prophesize(ClockInterface::class);
         $implementation = $this->getImplementation();

@@ -16,7 +16,7 @@ final class BusQueSpec extends AbstractSpec
 
     public function it_can_get_the_queue_name_for_a_command()
     {
-        $this->queueNameResolver->resolveQueueName('test_command')->willReturn('test_queue');
+        $this->queueResolver->resolveQueueName('test_command')->willReturn('test_queue');
         $this->getQueueName('test_command')->shouldReturn('test_queue');
         $this->getQueueName('test_command');
     }

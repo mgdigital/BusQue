@@ -5,7 +5,7 @@ namespace MGDigital\BusQue;
 class Implementation
 {
 
-    private $queueNameResolver;
+    private $queueResolver;
     private $commandSerializer;
     private $commandIdGenerator;
     private $queueAdapter;
@@ -15,7 +15,7 @@ class Implementation
     private $errorHandler;
 
     public function __construct(
-        QueueNameResolverInterface $queueNameResolver,
+        QueueResolverInterface $queueResolver,
         CommandSerializerInterface $commandSerializer,
         CommandIdGeneratorInterface $commandIdGenerator,
         QueueAdapterInterface $queueAdapter,
@@ -24,7 +24,7 @@ class Implementation
         CommandBusAdapterInterface $commandBusAdapter,
         ErrorHandlerInterface $errorHandler
     ) {
-        $this->queueNameResolver = $queueNameResolver;
+        $this->queueResolver = $queueResolver;
         $this->commandSerializer = $commandSerializer;
         $this->commandIdGenerator = $commandIdGenerator;
         $this->queueAdapter = $queueAdapter;
@@ -34,9 +34,9 @@ class Implementation
         $this->errorHandler = $errorHandler;
     }
 
-    public function getQueueNameResolver(): QueueNameResolverInterface
+    public function getQueueResolver(): QueueResolverInterface
     {
-        return $this->queueNameResolver;
+        return $this->queueResolver;
     }
 
     public function getCommandSerializer(): CommandSerializerInterface

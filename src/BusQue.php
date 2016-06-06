@@ -14,7 +14,7 @@ class BusQue
 
     public function getQueueName($command): string
     {
-        return $this->implementation->getQueueNameResolver()->resolveQueueName($command);
+        return $this->implementation->getQueueResolver()->resolveQueueName($command);
     }
 
     public function serializeCommand($command): string

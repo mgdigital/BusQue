@@ -29,7 +29,7 @@ final class CommandHandler
     private function process(BusQueCommandInterface $command): array
     {
         $baseCommand = $command->getCommand();
-        $queueName = $this->implementation->getQueueNameResolver()
+        $queueName = $this->implementation->getQueueResolver()
             ->resolveQueueName($baseCommand);
         $commandId = $command->getId() ?: $this->implementation->getCommandIdGenerator()
                 ->generateId($baseCommand);
