@@ -23,6 +23,7 @@ class SimpleQueueVoter implements QueueVoterInterface
             $queueName = $this->resolver->resolveQueueName($command);
             return new QueueVote($queueName, $this->confidence);
         } catch (QueueResolverException $e) {
+            // Don't vote if the resolver cannot name a queue.
         }
     }
 }
