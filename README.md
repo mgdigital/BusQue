@@ -7,7 +7,7 @@ BusQue
 
 I built BusQue because I found a lack of choice of simple message queues for medium-sized PHP applications.
 
-The name BusQue signifies Command Bus + Message Queue. Following [CQRS](http://martinfowler.com/bliki/CQRS.html) principles, it was designed to be used in conjunction with [Tactician](https://github.com/thephpleague/tactician) and [Redis](http://redis.io/) using the [Predis](https://github.com/nrk/predis) client, along with a serializer such as PHP serialize(), [JMS Serializer](https://github.com/schmittjoh/serializer) or [MessagePack](https://github.com/rybakit/msgpack.php), but is open to replacement with alternate adapters.
+The name BusQue signifies Command Bus + Message Queue. It was designed to be used in conjunction with [Tactician](https://github.com/thephpleague/tactician) and [Redis](http://redis.io/) using the [Predis](https://github.com/nrk/predis) client, along with a serializer such as PHP serialize(), [JMS Serializer](https://github.com/schmittjoh/serializer) or [MessagePack](https://github.com/rybakit/msgpack.php), but is open to replacement with alternate adapters.
 
 One key feature I found missing in other queues is the ability to assign a unique ID to a job, allowing the same job to be queued multiple times but have it only execute once after the last insertion.
 
