@@ -168,31 +168,28 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null)
     {
-        $lowScore = $start ? $start->getTimestamp() : '-inf';
-        $highScore = $end ? $end->getTimestamp() : '+inf';
-        if ($queueNames === null) {
-            $queueNames = $this->getQueueNames();
-        }
-        foreach ($queueNames as $queueName) {
-            $this->clearScheduleForQueue($queueName, $lowScore, $highScore);
-        }
+        $this->clearScheduleForQueues(
+            $queueNames,
+            $start ? $start->getTimestamp() : '-inf',
+            $end ? $end->getTimestamp() : '+inf'
+        );
     }
 
-    private function clearScheduleForQueue(string $queueName, $lowScore, $highScore)
+    private function clearScheduleForQueues(array $queueNames = null, $lowScore, $highScore)
     {
         $result = $this->client->zrangebyscore(':schedule', $lowScore, $highScore);
         if (!empty($result)) {
-            $this->client->pipeline(function (ClientContextInterface $client) use ($result, $queueName) {
-                $idsToRelease = [ ];
+            $this->client->pipeline(function (ClientContextInterface $client) use ($result, $queueNames) {
+                $idsByQueue = [ ];
                 foreach ($result as $json) {
                     list($thisQueueName, $id) = json_decode($json, true);
-                    if ($thisQueueName === $queueName) {
+                    if ($queueNames === null || in_array($thisQueueName, $queueNames, true)) {
                         $client->zrem(':schedule', [ $json ]);
-                        $idsToRelease[ ] = $id;
+                        $idsByQueue[ $thisQueueName ][ ] = $id;
                     }
                 }
-                if ($idsToRelease !== [ ]) {
-                    self::cReleaseReservedCommandIds($client, $queueName, $idsToRelease);
+                foreach ($idsByQueue as $queueName => $ids) {
+                    self::cReleaseReservedCommandIds($client, $queueName, $ids);
                 }
             });
         }
