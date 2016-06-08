@@ -168,21 +168,11 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null)
     {
-        $this->clearScheduleForQueues(
-            $queueNames,
+        $result = $this->client->zrangebyscore(
+            ':schedule',
             $start ? $start->getTimestamp() : '-inf',
             $end ? $end->getTimestamp() : '+inf'
         );
-    }
-
-    /**
-     * @param array|null $queueNames
-     * @param mixed $lowScore
-     * @param mixed $highScore
-     */
-    private function clearScheduleForQueues($queueNames, $lowScore, $highScore)
-    {
-        $result = $this->client->zrangebyscore(':schedule', $lowScore, $highScore);
         if (!empty($result)) {
             $this->client->pipeline(function (ClientContextInterface $client) use ($result, $queueNames) {
                 $idsByQueue = [ ];
