@@ -60,7 +60,7 @@ $implementation = new BusQue\Implementation(
 
 $busQue = new BusQue\BusQue($implementation);
 ```
-The `BusQue\CommandHandler` class also needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
+The `BusQue\Handler\QueuedCommandHandler` and `BusQue\Handler\ScheduledCommandHandler` classes also needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
 
 If you're using the Symfony bundle, then all of the above is done for you, and you can just get the `busque` service from the container.
 
@@ -194,11 +194,64 @@ $busQue->purgeCommand($queueName, $uniqueCommandId);
 
 ### Clearing a queue
 
-```
+```php
 <?php
 
-$busQue->emptyQueue($queueName);
+$busQue->clearQueue($queueName);
 ```
+
+
+### Listing the IDs of commands currently in a queue
+
+```php
+<?php
+
+$ids = $busQue->listQueuedIds($queueName); // ['command1id', 'command2id']
+```
+
+
+### Counting the commands currently in progress
+
+```php
+<?php
+
+echo $busQue->getInProgressCount($queueName); // 0
+```
+
+
+### Listing the IDs of commands currently in progress
+
+```php
+<?php
+
+$ids = $busQue->listInProgressIds($queueName); // []
+```
+
+
+### Reading a command from the queue based on its ID
+
+This method returns an unserialized command from BusQue based on its queue name and ID, leaving any messages in the queue untouched, and throwing a `BusQue\CommandNotFoundException` if the command was not found in the command store.
+
+```php
+<?php
+
+$command = $busQue->getCommand($queueName, $uniqueCommandId);
+```
+
+
+### Auto-queuing commands
+
+After using BusQue for a short time I realised that the code which issues a command should (usually) not care whether the command is executed in a blocking method call or put in the queue. The decision of whether to execute a command now or put it in a queue, can be decoupled from the decision to issue the command.
+
+Another advantage of auto-queuing, is that if you're already using a command bus in your application, you can enable the auto-queuing middleware, and use BusQue with minimal modification to your existing code.
+
+If you're using the Symfony bundle, then the auto-queuing middleware is already configured, and you just need to add the `busque.tactician.auto_queuing_middleware` service to the list of Tactician middlewares (it should be added after the locking middleware).
+
+If you want to use auto-queuing outside of Symfony, I'd suggest looking at [MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) and copying the service configuration in `src/Resources/config` - you need to use the `BusQue\AutoQueue\AutoQueuingCommandBusAdapter` along with the `BusQue\Tactician\AutoQueuingMiddleware`, and be careful to configure it correctly to avoid either a circular dependency, or an infinite loop of messages being taken out of the queue and immediately auto-requeued.
+
+With the Symfony bundle, you can then configure `busque.auto_queue.classnames` to be an array of command class names which should be auto-queued. Alternatively you can dig into the code and configure your own auto-queuing rules.
+
+With auto-queuing enabled, it's rarely necessary to use the `$busQue->queueCommand($command)` method, in fact most of your application doesn't have to care that BusQue is even installed.
 
 
 Tests
@@ -221,5 +274,5 @@ And run the Behat acceptance suite:
 
 Warnings
 --------
-- I've only just written this so there may be some gotchas that I haven't encountered yet. I intend to improve its resilience and expand it with further capabilities as time permits, and also welcome pull requests!
+- I've only just written this so there may be some gotchas that I haven't encountered yet. The API is still subject to change as I iron out issues. I intend to improve its resilience and expand it with further capabilities as time permits, and also welcome pull requests!
 - I've not used this in production yet but I intend to soon! Good luck :)
