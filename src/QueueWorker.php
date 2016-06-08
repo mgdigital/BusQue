@@ -39,7 +39,7 @@ class QueueWorker
             $command = $this->implementation->getCommandSerializer()
                 ->unserialize($received->getSerialized());
             $this->implementation->getCommandBusAdapter()
-                ->handle($command);
+                ->handle($command, true);
             $this->implementation->getQueueAdapter()
                 ->setCommandCompleted($received->getQueueName(), $received->getId());
         } catch (\Throwable $exception) {

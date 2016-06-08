@@ -45,7 +45,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         }
         if (!$id) {
             if ($timeout !== null) {
-                $timeout = max(0, time() - $stopwatchStart - $timeout);
+                $timeout = time() - $stopwatchStart - $timeout;
                 if ($timeout <= 0) {
                     throw new TimeoutException;
                 }
@@ -121,7 +121,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         return $serialized;
     }
 
-    public function emptyQueue(string $queueName)
+    public function clearQueue(string $queueName)
     {
         self::cEmptyQueue($this->client, $queueName);
     }
@@ -131,6 +131,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         $this->client->pipeline(function (ClientContextInterface $client) use ($queueName) {
             self::cDeleteQueue($client, $queueName);
         });
+        $this->clearSchedule([$queueName]);
     }
 
     public function purgeCommand(string $queueName, string $id)
@@ -167,8 +168,8 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null)
     {
-        $lowScore = $start ? $start->getTimestamp() : 0;
-        $highScore = $end ? $end->getTimestamp() : -1;
+        $lowScore = $start ? $start->getTimestamp() : '-inf';
+        $highScore = $end ? $end->getTimestamp() : '+inf';
         if ($queueNames === null) {
             $queueNames = $this->getQueueNames();
         }
@@ -177,14 +178,16 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             if (!empty($result)) {
                 $this->client->pipeline(function (ClientContextInterface $client) use ($result, $queueName) {
                     $idsToRelease = [ ];
-                    foreach ($result as $json => $score) {
+                    foreach ($result as $json) {
                         list($thisQueueName, $id) = json_decode($json, true);
                         if ($thisQueueName === $queueName) {
-                            $client->zrem(':schedule', $json);
+                            $client->zrem(':schedule', [ $json ]);
                             $idsToRelease[ ] = $id;
                         }
                     }
-                    self::cReleaseReservedCommandIds($client, $queueName, $idsToRelease);
+                    if ($idsToRelease !== [ ]) {
+                        self::cReleaseReservedCommandIds($client, $queueName, $idsToRelease);
+                    }
                 });
             }
         }
@@ -286,7 +289,6 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         $client->del([
             ":{$queueName}:queue",
             ":{$queueName}:consuming",
-            ":{$queueName}:command_store",
             ":{$queueName}:command_status",
             ":{$queueName}:queue_ids"
         ]);
@@ -295,6 +297,6 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
     private static function cDeleteQueue($client, string $queueName)
     {
         self::cEmptyQueue($client, $queueName);
-        $client->srem(':queues', $queueName);
+        $client->srem(':queues', [ $queueName ]);
     }
 }

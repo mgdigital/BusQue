@@ -66,7 +66,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function theQueueIsEmpty()
     {
-        $this->implementation->getQueueAdapter()->emptyQueue('test_queue');
+        $this->implementation->getQueueAdapter()->clearQueue('test_queue');
         $this->thereShouldBeNCommandsInTheQueue(0);
     }
 
@@ -115,7 +115,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function theCommandWillThrowAnExceptionWhenItIsHandled()
     {
-        $this->commandBus->handle('test_command')->willThrow(new \Exception());
+        $this->commandBus->handle('test_command', true)->willThrow(new \Exception());
     }
 
     /**
@@ -142,7 +142,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function theCommandArgShouldHaveRun($arg1)
     {
-        $this->commandBus->handle($arg1)->shouldHaveBeenCalled();
+        $this->commandBus->handle($arg1, true)->shouldHaveBeenCalled();
     }
 
     /**
@@ -220,5 +220,38 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
         try {
             $worker->work(null, 100, 0);
         } catch (TimeoutException $e) {}
+    }
+
+    /**
+     * @When I clear the queue
+     */
+    public function iClearTheQueue()
+    {
+        $this->implementation->getQueueAdapter()->clearQueue('test_queue');
+    }
+
+    /**
+     * @When I delete the queue
+     */
+    public function iDeleteTheQueue()
+    {
+        $this->implementation->getQueueAdapter()->deleteQueue('test_queue');
+    }
+
+    /**
+     * @Then the queue should have been deleted
+     */
+    public function theQueueShouldHaveBeenDeleted()
+    {
+        $queueNames = $this->implementation->getQueueAdapter()->getQueueNames();
+        \PHPUnit_Framework_Assert::assertFalse(in_array('test_queue', $queueNames));
+    }
+
+    /**
+     * @When I clear the schedule
+     */
+    public function iClearTheSchedule()
+    {
+        $this->implementation->getSchedulerAdapter()->clearSchedule();
     }
 }

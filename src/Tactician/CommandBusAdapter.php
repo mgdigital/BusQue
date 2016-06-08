@@ -15,7 +15,7 @@ class CommandBusAdapter implements CommandBusAdapterInterface
         $this->commandBus = $commandBus;
     }
 
-    public function handle($command)
+    public function handle($command, bool $fromQueue = false)
     {
         $this->commandBus->handle($command);
     }

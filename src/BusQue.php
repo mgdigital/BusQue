@@ -57,9 +57,14 @@ class BusQue
         $this->implementation->getQueueAdapter()->purgeCommand($queueName, $commandId);
     }
 
-    public function emptyQueue(string $queueName)
+    public function clearQueue(string $queueName)
     {
-        $this->implementation->getQueueAdapter()->emptyQueue($queueName);
+        $this->implementation->getQueueAdapter()->clearQueue($queueName);
+    }
+
+    public function deleteQueue(string $queueName)
+    {
+        $this->implementation->getQueueAdapter()->deleteQueue($queueName);
     }
 
     public function listQueues(): array

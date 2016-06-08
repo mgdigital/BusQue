@@ -89,3 +89,35 @@ Feature: Command Bus Queue
     And I run the scheduler worker
     Then there should be 0 commands in the queue
     And the command should have a status of "not_found"
+
+  Scenario: Clearing a queue
+    Given I queue "test_command" with ID "id1"
+    And I queue "another_command" with ID "id2"
+    And I schedule "yet_another_command" with ID "id3" to run at 15:00
+    And the time is 15:01
+    When I clear the queue
+    Then there should be 0 commands in the queue
+    And I run the scheduler worker
+    Then there should be 1 commands in the queue
+    When I clear the queue
+    And I run the scheduler worker
+    Then there should be 0 commands in the queue
+
+  Scenario: Deleting a queue
+    Given I queue "test_command" with ID "id1"
+    And I queue "another_command" with ID "id2"
+    And I schedule "yet_another_command" with ID "id3" to run at 15:00
+    And the time is 15:01
+    When I delete the queue
+    And I run the scheduler worker
+    Then there should be 0 commands in the queue
+    And the queue should have been deleted
+
+  Scenario: Clearing the schedule
+    Given the queue is empty
+    And I schedule "test_command" with ID "test_id" to run at 15:00
+    And I schedule "another_command" with ID "another_id" to run at 15:00
+    And the time is 15:00
+    When I clear the schedule
+    And I run the scheduler worker
+    Then there should be 0 commands in the queue
