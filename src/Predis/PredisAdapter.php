@@ -174,22 +174,27 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             $queueNames = $this->getQueueNames();
         }
         foreach ($queueNames as $queueName) {
-            $result = $this->client->zrangebyscore(':schedule', $lowScore, $highScore);
-            if (!empty($result)) {
-                $this->client->pipeline(function (ClientContextInterface $client) use ($result, $queueName) {
-                    $idsToRelease = [ ];
-                    foreach ($result as $json) {
-                        list($thisQueueName, $id) = json_decode($json, true);
-                        if ($thisQueueName === $queueName) {
-                            $client->zrem(':schedule', [ $json ]);
-                            $idsToRelease[ ] = $id;
-                        }
+            $this->clearScheduleForQueue($queueName, $lowScore, $highScore);
+        }
+    }
+
+    private function clearScheduleForQueue(string $queueName, $lowScore, $highScore)
+    {
+        $result = $this->client->zrangebyscore(':schedule', $lowScore, $highScore);
+        if (!empty($result)) {
+            $this->client->pipeline(function (ClientContextInterface $client) use ($result, $queueName) {
+                $idsToRelease = [ ];
+                foreach ($result as $json) {
+                    list($thisQueueName, $id) = json_decode($json, true);
+                    if ($thisQueueName === $queueName) {
+                        $client->zrem(':schedule', [ $json ]);
+                        $idsToRelease[ ] = $id;
                     }
-                    if ($idsToRelease !== [ ]) {
-                        self::cReleaseReservedCommandIds($client, $queueName, $idsToRelease);
-                    }
-                });
-            }
+                }
+                if ($idsToRelease !== [ ]) {
+                    self::cReleaseReservedCommandIds($client, $queueName, $idsToRelease);
+                }
+            });
         }
     }
 
