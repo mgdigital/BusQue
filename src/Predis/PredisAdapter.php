@@ -175,7 +175,12 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         );
     }
 
-    private function clearScheduleForQueues(array $queueNames = null, $lowScore, $highScore)
+    /**
+     * @param array|null $queueNames
+     * @param mixed $lowScore
+     * @param mixed $highScore
+     */
+    private function clearScheduleForQueues($queueNames, $lowScore, $highScore)
     {
         $result = $this->client->zrangebyscore(':schedule', $lowScore, $highScore);
         if (!empty($result)) {
