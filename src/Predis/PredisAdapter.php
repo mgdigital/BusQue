@@ -16,6 +16,8 @@ use Predis\Connection\ConnectionException;
 class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 {
 
+    const LUA_PATH = __DIR__ . '/../../lua';
+
     private $client;
 
     public function __construct(Client $client)
@@ -25,13 +27,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function queueCommand(string $queueName, string $id, string $serialized)
     {
-        if (!$this->storeCommandAndCheckIfIdReserved($queueName, $id, $serialized)) {
-            $this->client->transaction(function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
-                self::cReserveCommandId($client, $queueName, $id);
-                self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_QUEUED);
-                $client->lpush(":{$queueName}:queue", [ $id ]);
-            });
-        }
+        $this->executeLuaScript('queue_message', [$queueName, $id, $serialized]);
     }
 
     public function awaitCommand(string $queueName, int $timeout = null): ReceivedCommand
@@ -53,38 +49,28 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
             return $this->awaitCommand($queueName, $timeout);
         }
         /* @var $id string */
-        list(, $serialized) = $this->client->transaction(
-            function (ClientContextInterface $client) use ($queueName, $id) {
-                self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_IN_PROGRESS);
-                self::cRetrieveCommand($client, $queueName, $id);
-                self::cReleaseReservedCommandIds($client, $queueName, [ $id ]);
-            }
-        );
+        $serialized = $this->executeLuaScript('receive_message', [$queueName, $id]);
         return new ReceivedCommand($queueName, $id, $serialized);
     }
 
     public function getCommandStatus(string $queueName, string $id): string
     {
-        return $this->client->hget(":{$queueName}:command_status", $id) ?? self::STATUS_NOT_FOUND;
+        return $this->client->hget(":{$queueName}:statuses", $id) ?? self::STATUS_NOT_FOUND;
     }
 
     public function setCommandCompleted(string $queueName, string $id)
     {
-        $this->client->transaction(function (ClientContextInterface $client) use ($queueName, $id) {
-            self::cEndCommand($client, $queueName, $id, self::STATUS_COMPLETED);
-        });
+        $this->executeLuaScript('acknowledge_message', [$queueName, $id]);
     }
 
     public function setCommandFailed(string $queueName, string $id)
     {
-        $this->client->transaction(function (ClientContextInterface $client) use ($queueName, $id) {
-            self::cEndCommand($client, $queueName, $id, self::STATUS_FAILED);
-        });
+        $this->executeLuaScript('reject_message', [$queueName, $id]);
     }
 
     public function putQueue(string $queueName)
     {
-        self::cAddQueue($this->client, $queueName);
+        $this->client->sadd(':queues', [ $queueName ]);
     }
 
     public function getQueueNames(): array
@@ -114,7 +100,7 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function readCommand(string $queueName, string $id): string
     {
-        $serialized = self::cRetrieveCommand($this->client, $queueName, $id);
+        $serialized = $this->client->hget(":{$queueName}:messages", $id);
         if ($serialized === null) {
             throw new CommandNotFoundException();
         }
@@ -123,42 +109,23 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function clearQueue(string $queueName)
     {
-        self::cEmptyQueue($this->client, $queueName);
+        $this->executeLuaScript('empty_queue', [$queueName]);
     }
 
     public function deleteQueue(string $queueName)
     {
-        $this->client->pipeline(function (ClientContextInterface $client) use ($queueName) {
-            self::cDeleteQueue($client, $queueName);
-        });
+        $this->clearQueue($queueName);
         $this->clearSchedule([$queueName]);
     }
 
     public function purgeCommand(string $queueName, string $id)
     {
-        $this->client->transaction(function (ClientContextInterface $client) use ($queueName, $id) {
-            $client->hdel(":{$queueName}:command_store", [ $id ]);
-            $client->hdel(":{$queueName}:command_status", [ $id ]);
-            self::cReleaseReservedCommandIds($client, $queueName, [ $id ]);
-            $json = json_encode([ $queueName, $id ]);
-            $client->lrem(":{$queueName}:queue", 1, $id);
-            $client->lrem(":{$queueName}:consuming", 1, $id);
-            $client->zrem(':schedule', $json);
-        });
+        $this->executeLuaScript('purge_message', [$queueName, $id]);
     }
 
     public function scheduleCommand(string $queueName, string $id, string $serialized, \DateTime $dateTime)
     {
-        if (!$this->storeCommandAndCheckIfIdReserved($queueName, $id, $serialized)) {
-            $this->client->transaction(
-                function (ClientContextInterface $client) use ($queueName, $id, $dateTime) {
-                    self::cReserveCommandId($client, $queueName, $id);
-                    self::cUpdateCommandStatus($client, $queueName, $id, self::STATUS_SCHEDULED);
-                    $json = json_encode([ $queueName, $id ]);
-                    $client->zadd(':schedule', [ $json => $dateTime->getTimestamp() ]);
-                }
-            );
-        }
+        $this->executeLuaScript('schedule_message', [$queueName, $id, $serialized, $dateTime->getTimestamp()]);
     }
 
     public function cancelScheduledCommand(string $queueName, string $id)
@@ -168,25 +135,15 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
 
     public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null)
     {
-        $result = $this->client->zrangebyscore(
-            ':schedule',
-            $start ? $start->getTimestamp() : '-inf',
-            $end ? $end->getTimestamp() : '+inf'
-        );
-        if (!empty($result)) {
-            $this->client->transaction(function (ClientContextInterface $client) use ($result, $queueNames) {
-                $idsByQueue = [ ];
-                foreach ($result as $json) {
-                    list($thisQueueName, $id) = json_decode($json, true);
-                    if ($queueNames === null || in_array($thisQueueName, $queueNames, true)) {
-                        $client->zrem(':schedule', [ $json ]);
-                        $idsByQueue[ $thisQueueName ][ ] = $id;
-                    }
-                }
-                foreach ($idsByQueue as $queueName => $ids) {
-                    self::cReleaseReservedCommandIds($client, $queueName, $ids);
-                }
-            });
+        if ($queueNames === null) {
+            $queueNames = [ null ];
+        }
+        foreach ($queueNames as $queueName) {
+            $this->executeLuaScript('clear_schedule', [
+                $queueName,
+                $start ? $start->getTimestamp() : '-inf',
+                $end ? $end->getTimestamp() : '+inf'
+            ]);
         }
     }
 
@@ -200,100 +157,31 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         } else {
             $start = $startTime->getTimestamp();
         }
-        $result = $this->client->zrangebyscore(':schedule', $start, $now->getTimestamp(), [
-            'limit' => [ 0, $limit ],
-            'withscores' => true,
+        
+        $results = $this->executeLuaScript('receive_due_messages', [
+            $start,
+            $now->getTimestamp(),
+            $limit
         ]);
+
         $commands = [ ];
-        if ($result !== [ ]) {
-            $queueNamesById = $idsByJson = [ ];
-            $responses = $this->client->transaction(
-                function (ClientContextInterface $client) use ($result, &$queueNamesById, &$idsByJson) {
-                    $idsByQueueName = [ ];
-                    foreach ($result as $json => $score) {
-                        list($queueName, $id) = json_decode($json, true);
-                        self::cRetrieveCommand($client, $queueName, $id);
-                        $idsByQueueName[ $queueName ][ ] = $id;
-                        $queueNamesById[ $id ] = $queueName;
-                        $idsByJson[ $json ] = $id;
-                    }
-                    $client->zrem(':schedule', array_keys($result));
-                    foreach ($idsByQueueName as $queueName => $ids) {
-                        self::cReleaseReservedCommandIds($client, $queueName, $ids);
-                    }
-                }
+
+        foreach ($results as $result) {
+            list($queueName, $id, $message, $score) = $result;
+            $commands[ ] = new ReceivedScheduledCommand(
+                $queueName,
+                $id,
+                $message,
+                new \DateTime('@'.$score)
             );
-            foreach (array_keys($result) as $index => $json) {
-                $id = $idsByJson[ $json ];
-                $commands[ ] = new ReceivedScheduledCommand(
-                    $queueNamesById[ $id ],
-                    $id,
-                    $responses[ $index ],
-                    new \DateTime('@'.$result[ $json ])
-                );
-            }
         }
         return $commands;
     }
 
-    private function storeCommandAndCheckIfIdReserved(string $queueName, string $id, string $serialized): bool
+    private function executeLuaScript(string $script, array $args)
     {
-        list (, , $isReserved) = $this->client->pipeline(
-            function (ClientContextInterface $client) use ($queueName, $id, $serialized) {
-                $client->hset(":{$queueName}:command_store", $id, $serialized);
-                self::cAddQueue($client, $queueName);
-                $client->sismember(":{$queueName}:queue_ids", $id);
-            }
-        );
-        return $isReserved;
-    }
-
-    private static function cRetrieveCommand($client, string $queueName, string $id)
-    {
-        return $client->hget(":{$queueName}:command_store", $id);
-    }
-
-    private static function cReserveCommandId($client, string $queueName, string $id)
-    {
-        $client->sadd(":{$queueName}:queue_ids", [ $id ]);
-    }
-
-    private static function cEndCommand($client, string $queueName, string $id, string $status)
-    {
-        self::cUpdateCommandStatus($client, $queueName, $id, $status);
-        self::cReleaseReservedCommandIds($client, $queueName, [ $id ]);
-        $client->srem(":{$queueName}:queue_ids", [ $id ]);
-        $client->lrem(":{$queueName}:consuming", 1, $id);
-    }
-
-    private static function cReleaseReservedCommandIds($client, string $queueName, array $ids)
-    {
-        $client->srem(":{$queueName}:queue_ids", $ids);
-    }
-
-    private static function cUpdateCommandStatus($client, string $queueName, string $id, string $status)
-    {
-        $client->hset(":{$queueName}:command_status", $id, $status);
-    }
-
-    private static function cAddQueue($client, string $queueName)
-    {
-        $client->sadd(':queues', [ $queueName ]);
-    }
-
-    private static function cEmptyQueue($client, string $queueName)
-    {
-        $client->del([
-            ":{$queueName}:queue",
-            ":{$queueName}:consuming",
-            ":{$queueName}:command_status",
-            ":{$queueName}:queue_ids"
-        ]);
-    }
-
-    private static function cDeleteQueue($client, string $queueName)
-    {
-        self::cEmptyQueue($client, $queueName);
-        $client->srem(':queues', [ $queueName ]);
+        $command = new LuaFileCommand(static::LUA_PATH . '/' . $script . '.lua');
+        $command->setArguments($args);
+        return $this->client->executeCommand($command);
     }
 }
