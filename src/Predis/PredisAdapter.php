@@ -35,22 +35,23 @@ class PredisAdapter implements QueueAdapterInterface, SchedulerAdapterInterface
         $stopwatchStart = time();
         $this->client->ping();
         try {
-            $id = $this->client->brpoplpush(":{$queueName}:queue", ":{$queueName}:consuming", $timeout ?? 0);
+            $id = $this->client->brpoplpush(":{$queueName}:queue", ":{$queueName}:receiving", $timeout ?? 0);
         } catch (ConnectionException $e) {
             $id = null;
         }
-        if (!$id) {
-            if ($timeout !== null) {
-                $timeout = time() - $stopwatchStart - $timeout;
-                if ($timeout <= 0) {
-                    throw new TimeoutException;
-                }
+        if (!empty($id)) {
+            $serialized = $this->executeLuaScript('receive_message', [$queueName, $id]);
+            if (!empty($serialized)) {
+                return new ReceivedCommand($queueName, $id, $serialized);
             }
-            return $this->awaitCommand($queueName, $timeout);
         }
-        /* @var $id string */
-        $serialized = $this->executeLuaScript('receive_message', [$queueName, $id]);
-        return new ReceivedCommand($queueName, $id, $serialized);
+        if ($timeout !== null) {
+            $timeout = time() - $stopwatchStart - $timeout;
+            if ($timeout <= 0) {
+                throw new TimeoutException;
+            }
+        }
+        return $this->awaitCommand($queueName, $timeout);
     }
 
     public function getCommandStatus(string $queueName, string $id): string
