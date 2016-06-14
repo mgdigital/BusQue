@@ -239,21 +239,6 @@ $command = $busQue->getCommand($queueName, $uniqueCommandId);
 ```
 
 
-### Auto-queuing commands
-
-After using BusQue for a short time I realised that the code which issues a command should (usually) not care whether the command is executed in a blocking method call or put in the queue. The decision of whether to execute a command now or put it in a queue, can be decoupled from the decision to issue the command.
-
-Another advantage of auto-queuing, is that if you're already using a command bus in your application, you can enable the auto-queuing middleware, and use BusQue with minimal modification to your existing code.
-
-If you're using the Symfony bundle, then the auto-queuing middleware is already configured, and you just need to add the `busque.tactician.auto_queuing_middleware` service to the list of Tactician middlewares (it should be added after the locking middleware).
-
-If you want to use auto-queuing outside of Symfony, I'd suggest looking at [MGDigitalBusQueBundle](https://github.com/mgdigital/BusQueBundle) and copying the service configuration in `src/Resources/config` - you need to use the `BusQue\AutoQueue\AutoQueuingCommandBusAdapter` along with the `BusQue\Tactician\AutoQueuingMiddleware`, and be careful to configure it correctly to avoid either a circular dependency, or an infinite loop of messages being taken out of the queue and immediately auto-requeued.
-
-With the Symfony bundle, you can then configure `busque.auto_queue.classnames` to be an array of command class names which should be auto-queued. Alternatively you can dig into the code and configure your own auto-queuing rules.
-
-With auto-queuing enabled, it's rarely necessary to use the `$busQue->queueCommand($command)` method, in fact most of your application doesn't have to care that BusQue is even installed.
-
-
 Tests
 -----
 
