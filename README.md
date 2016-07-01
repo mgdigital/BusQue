@@ -38,7 +38,8 @@ To use BusQue you first need to instantiate an instance of `BusQue\Implementatio
 
 use MGDigital\BusQue as BusQue;
 
-$predisAdapter = new BusQue\Predis\PredisAdapter(new Predis\Client());
+// The BusQue\Predis\Client class extends Predis\Client, and prevents an exception being thrown when the Client::getIterator() method is called.
+$predisAdapter = new BusQue\Predis\PredisAdapter(new BusQue\Predis\Client());
 
 $implementation = new BusQue\Implementation(
     // Results in queues named by the command classname, backslashes replaced with underscores:
