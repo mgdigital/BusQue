@@ -30,10 +30,6 @@ interface QueueDriverInterface
 
     public function getConsumingIds(string $queueName): array;
 
-    public function isIdRejected(string $queueName, string $id): bool;
-
-    public function clearRejections(string $queueName);
-
     /**
      * @param string $queueName
      * @param string $id

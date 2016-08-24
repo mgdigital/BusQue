@@ -101,16 +101,6 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
         return $this->adapter->sMembers("{$this->namespace}:{$queueName}:consuming");
     }
 
-    public function isIdRejected(string $queueName, string $id): bool
-    {
-        return $this->adapter->sIsMember("{$this->namespace}:{$queueName}:rejected", $id);
-    }
-
-    public function clearRejections(string $queueName)
-    {
-        return $this->adapter->del("{$this->namespace}:{$queueName}:rejected");
-    }
-
     public function readCommand(string $queueName, string $id): string
     {
         $serialized = $this->adapter->hGet("{$this->namespace}:{$queueName}:messages", $id);
