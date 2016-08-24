@@ -6,6 +6,6 @@ redis.call('HSET', ns..':'..queue..':messages', id, message)
 redis.call('SREM', ns..':'..queue..':queued_ids', id)
 redis.call('LREM', ns..':'..queue..':queue', 1, id)
 
-local joined = table.concat({queue, id}, '||')
+local joined = queue..'||'..id
 redis.call('ZREM', ns..':schedule', joined)
 redis.call('ZADD', ns..':schedule', timestamp, joined)
