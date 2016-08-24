@@ -42,7 +42,9 @@ use MGDigital\BusQue as BusQue;
 $redis = new \Redis();
 $adapter = new BusQue\Redis\PHPRedis\PHPRedisAdapter($redis);
 
-// A Predis adepter is also included. The BusQue\Predis\Client class extends Predis\Client, and prevents an exception being thrown when the Client::getIterator() method is called:
+// A Predis adepter is also included.
+// Predis can have issues when used in long-running process, and the PHPRedis client is preferred.
+// The BusQue\Redis\Predis\Client class extends Predis\Client, and prevents an exception being thrown when the Client::getIterator() method is called.
 $client = new BusQue\Redis\Predis\Client();
 $adapter = new BusQue\Redis\Predis\PredisAdapter($client);
 
