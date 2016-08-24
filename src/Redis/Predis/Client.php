@@ -1,6 +1,6 @@
 <?php
 
-namespace MGDigital\BusQue\Predis;
+namespace MGDigital\BusQue\Redis\Predis;
 
 use Predis\Client as BaseClient;
 

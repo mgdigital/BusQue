@@ -7,7 +7,7 @@ BusQue
 
 I built BusQue because I found a lack of choice of simple message queues for medium-sized PHP applications.
 
-The name BusQue signifies Command Bus + Message Queue. It was designed to be used in conjunction with [Tactician](https://github.com/thephpleague/tactician) and [Redis](http://redis.io/) using the [Predis](https://github.com/nrk/predis) client, along with a serializer such as PHP serialize(), [JMS Serializer](https://github.com/schmittjoh/serializer) or [MessagePack](https://github.com/rybakit/msgpack.php), but is open to replacement with alternate adapters.
+The name BusQue signifies Command Bus + Message Queue. It was designed to be used in conjunction with [Tactician](https://github.com/thephpleague/tactician) and [Redis](http://redis.io/) using either the [PHPRedis](https://github.com/phpredis/phpredis) or [Predis](https://github.com/nrk/predis) clients, along with a serializer such as PHP serialize() or [JMS Serializer](https://github.com/schmittjoh/serializer), but is open to replacement with alternate adapters.
 
 One key feature I found missing in other queues is the ability to assign a unique ID to a job, allowing the same job to be queued multiple times but have it only execute once after the last insertion.
 
@@ -38,8 +38,15 @@ To use BusQue you first need to instantiate an instance of `BusQue\Implementatio
 
 use MGDigital\BusQue as BusQue;
 
-// The BusQue\Predis\Client class extends Predis\Client, and prevents an exception being thrown when the Client::getIterator() method is called.
-$predisAdapter = new BusQue\Predis\PredisAdapter(new BusQue\Predis\Client());
+// The preferred client is PHPRedis:
+$redis = new \Redis();
+$adapter = new BusQue\Redis\PHPRedis\PHPRedisAdapter($redis);
+
+// A Predis adepter is also included. The BusQue\Predis\Client class extends Predis\Client, and prevents an exception being thrown when the Client::getIterator() method is called:
+$client = new BusQue\Redis\Predis\Client();
+$adapter = new BusQue\Redis\Predis\PredisAdapter($client);
+
+$driver = new BusQue\Redis\RedisDriver($adapter);
 
 $implementation = new BusQue\Implementation(
     // Results in queues named by the command classname, backslashes replaced with underscores:
@@ -48,9 +55,9 @@ $implementation = new BusQue\Implementation(
     new BusQue\Serializer\PHPCommandSerializer(),
     // Commands without an explicit ID will have spl_object_hash() performed to generate the ID:
     new BusQue\IdGenerator\ObjectHashIdGenerator(),
-    // The Predis adapter is used as both the queue and scheduler:
-    $predisAdapter,
-    $predisadapter,
+    // The Redis driver is used as both the queue and scheduler:
+    $driver,
+    $driver,
     // Always returns the current time:
     new BusQue\SystemClock(),
     // Inject your command bus here:
@@ -147,17 +154,12 @@ Because we identified the command by the product ID, it will only be allowed in 
 
 Conversely, if you wanted to be able to issue the same command multiple times, and be sure the queue worker will run each copy of the command, you would have to ensure each copy of the command has a unique ID.
 
+This behaviour works as follows:
 
-### Checking a command's progress
-
-When we know the ID of a command and the name of its queue, we can also check its status:
-
-```php
-<?php
-
-$queueName = $busQue->getQueueName($command);
-echo $busQue->getCommandStatus($queueName, $uniqueCommandId); // completed
-```   
+- Only one command with the same ID may be queued or scheduled at one time
+- If a command with the same ID is currently in progress, a new command with the same ID may be queued
+- When the queue encounters a command whose ID is already in progress, the command will be re-inserted at the end of the queue
+- When scheduling a command with an ID which is already scheduled, the originally scheduled command will be replaced with the newly scheduled command
 
 
 ### Checking the length of a queue
@@ -198,7 +200,7 @@ $busQue->purgeCommand($queueName, $uniqueCommandId);
 ```php
 <?php
 
-$busQue->clearQueue($queueName);
+$busQue->deleteQueue($queueName);
 ```
 
 
@@ -208,15 +210,6 @@ $busQue->clearQueue($queueName);
 <?php
 
 $ids = $busQue->listQueuedIds($queueName); // ['command1id', 'command2id']
-```
-
-
-### Counting the commands currently in progress
-
-```php
-<?php
-
-echo $busQue->getInProgressCount($queueName); // 0
 ```
 
 
@@ -239,6 +232,7 @@ This method returns an unserialized command from BusQue based on its queue name 
 $command = $busQue->getCommand($queueName, $uniqueCommandId);
 ```
 
+*Further convenience commands can be found in the `BusQue\BusQue` class.*
 
 Tests
 -----
@@ -253,10 +247,23 @@ Run the phpspec test suite:
 
 And run the Behat acceptance suite:
 
-*Warning: this will attempt to write to your localhost Redis instance by default.* You may prefer to configure an alternate test client by replacing `features/Context/FeatureContext`.
+*Warning: this will attempt to write to your localhost Redis instance by default.* You may prefer to configure an alternate test client by providing an alternate `FeatureContext` class.
 
     bin/behat
 
+By default the Behat suite will test integration with PHPRedis. Integration with Predis can also be tested:
+
+Docker
+------
+
+A basic docker environment is included for testing.
+
+```sh
+
+cd docker
+docker-compose -f ./docker-compose.yml up
+docker exec -ti busque-php bin/behat -v
+```
 
 Warnings
 --------

@@ -42,54 +42,49 @@ class BusQue
         $this->implementation->getCommandBusAdapter()->handle(new ScheduledCommand($command, $dateTime, $commandId));
     }
 
-    public function getCommandStatus(string $queueName, string $commandId): string
+    public function isIdQueued(string $queueName, string $id): bool
     {
-        return $this->implementation->getQueueAdapter()->getCommandStatus($queueName, $commandId);
+        return $this->implementation->getQueueDriver()->isIdQueued($queueName, $id);
     }
 
     public function getQueuedCount(string $queueName): int
     {
-        return $this->implementation->getQueueAdapter()->getQueuedCount($queueName);
+        return $this->implementation->getQueueDriver()->getQueuedCount($queueName);
     }
 
     public function purgeCommand(string $queueName, string $commandId)
     {
-        $this->implementation->getQueueAdapter()->purgeCommand($queueName, $commandId);
-    }
-
-    public function clearQueue(string $queueName)
-    {
-        $this->implementation->getQueueAdapter()->clearQueue($queueName);
+        $this->implementation->getQueueDriver()->purgeCommand($queueName, $commandId);
     }
 
     public function deleteQueue(string $queueName)
     {
-        $this->implementation->getQueueAdapter()->deleteQueue($queueName);
+        $this->implementation->getQueueDriver()->deleteQueue($queueName);
     }
 
     public function listQueues(): array
     {
-        return $this->implementation->getQueueAdapter()->getQueueNames();
+        return $this->implementation->getQueueDriver()->getQueueNames();
     }
 
     public function listQueuedIds(string $queueName, int $offset = 0, int $limit = 10): array
     {
-        return $this->implementation->getQueueAdapter()->getQueuedIds($queueName, $offset, $limit);
+        return $this->implementation->getQueueDriver()->getQueuedIds($queueName, $offset, $limit);
     }
 
-    public function getInProgressCount(string $queueName): int
+    public function isIdInProgress(string $queueName, string $id): bool
     {
-        return $this->implementation->getQueueAdapter()->getConsumingCount($queueName);
+        return $this->implementation->getQueueDriver()->isIdConsuming($queueName, $id);
     }
 
-    public function listInProgressIds(string $queueName, int $offset = 0, int $limit = 10): array
+    public function listInProgressIds(string $queueName): array
     {
-        return $this->implementation->getQueueAdapter()->getConsumingIds($queueName, $offset, $limit);
+        return $this->implementation->getQueueDriver()->getConsumingIds($queueName);
     }
 
     public function getCommand(string $queueName, string $id)
     {
-        $serialized = $this->implementation->getQueueAdapter()->readCommand($queueName, $id);
+        $serialized = $this->implementation->getQueueDriver()->readCommand($queueName, $id);
         return $this->unserializeCommand($serialized);
     }
 

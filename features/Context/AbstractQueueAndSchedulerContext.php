@@ -7,14 +7,14 @@ use MGDigital\BusQue\QueueResolver\ClassNameQueueResolver;
 use MGDigital\BusQue\IdGenerator\ObjectHashIdGenerator;
 use MGDigital\BusQue\Implementation;
 use MGDigital\BusQue\Logging\LoggingErrorHandler;
-use MGDigital\BusQue\QueueAdapterInterface;
-use MGDigital\BusQue\SchedulerAdapterInterface;
+use MGDigital\BusQue\QueueDriverInterface;
+use MGDigital\BusQue\SchedulerDriverInterface;
 use MGDigital\BusQue\Serializer\PHPCommandSerializer;
 use MGDigital\BusQue\SystemClock;
 use MGDigital\BusQue\Tactician\CommandBusAdapter;
 use Psr\Log\NullLogger;
 
-abstract class AbstractQueueAndSchedulerContext extends AbstractFeatureContext
+abstract class AbstractQueueAndSchedulerContext extends AbstractBaseContext
 {
 
     protected function getImplementation(): Implementation
@@ -31,8 +31,8 @@ abstract class AbstractQueueAndSchedulerContext extends AbstractFeatureContext
         );
     }
 
-    abstract protected function getQueueAdapter(): QueueAdapterInterface;
+    abstract protected function getQueueAdapter(): QueueDriverInterface;
 
-    abstract protected function getSchedulerAdapter(): SchedulerAdapterInterface;
+    abstract protected function getSchedulerAdapter(): SchedulerDriverInterface;
 
 }

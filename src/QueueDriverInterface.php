@@ -5,7 +5,7 @@ namespace MGDigital\BusQue;
 use MGDigital\BusQue\Exception\CommandNotFoundException;
 use MGDigital\BusQue\Exception\TimeoutException;
 
-interface QueueAdapterInterface
+interface QueueDriverInterface
 {
 
     const STATUS_SCHEDULED = 'scheduled';
@@ -17,19 +17,11 @@ interface QueueAdapterInterface
 
     public function queueCommand(string $queueName, string $id, string $serialized);
 
-    public function getCommandStatus(string $queueName, string $id): string;
-
-    public function setCommandCompleted(string $queueName, string $id);
-
-    public function setCommandFailed(string $queueName, string $id);
+    public function completeCommand(string $queueName, string $id);
 
     public function getQueueNames(): array;
 
     public function getQueuedCount(string $queueName): int;
-
-    public function getConsumingCount(string $queueName): int;
-
-    public function clearQueue(string $queueName);
 
     public function deleteQueue(string $queueName);
 
@@ -37,9 +29,17 @@ interface QueueAdapterInterface
 
     public function purgeCommand(string $queueName, string $id);
 
+    public function isIdQueued(string $queueName, string $id): bool;
+
     public function getQueuedIds(string $queueName, int $offset = 0, int $limit = 10): array;
 
-    public function getConsumingIds(string $queueName, int $offset = 0, int $limit = 10): array;
+    public function isIdConsuming(string $queueName, string $id): bool;
+
+    public function getConsumingIds(string $queueName): array;
+
+    public function isIdRejected(string $queueName, string $id): bool;
+
+    public function clearRejections(string $queueName);
 
     /**
      * @param string $queueName

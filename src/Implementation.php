@@ -8,8 +8,8 @@ class Implementation
     private $queueResolver;
     private $commandSerializer;
     private $commandIdGenerator;
-    private $queueAdapter;
-    private $schedulerAdapter;
+    private $queueDriver;
+    private $schedulerDriver;
     private $clock;
     private $commandBusAdapter;
     private $errorHandler;
@@ -18,8 +18,8 @@ class Implementation
         QueueResolverInterface $queueResolver,
         CommandSerializerInterface $commandSerializer,
         CommandIdGeneratorInterface $commandIdGenerator,
-        QueueAdapterInterface $queueAdapter,
-        SchedulerAdapterInterface $schedulerAdapter,
+        QueueDriverInterface $queueDriver,
+        SchedulerDriverInterface $schedulerDriver,
         ClockInterface $clock,
         CommandBusAdapterInterface $commandBusAdapter,
         ErrorHandlerInterface $errorHandler
@@ -27,8 +27,8 @@ class Implementation
         $this->queueResolver = $queueResolver;
         $this->commandSerializer = $commandSerializer;
         $this->commandIdGenerator = $commandIdGenerator;
-        $this->queueAdapter = $queueAdapter;
-        $this->schedulerAdapter = $schedulerAdapter;
+        $this->queueDriver = $queueDriver;
+        $this->schedulerDriver = $schedulerDriver;
         $this->clock = $clock;
         $this->commandBusAdapter = $commandBusAdapter;
         $this->errorHandler = $errorHandler;
@@ -49,14 +49,14 @@ class Implementation
         return $this->commandIdGenerator;
     }
 
-    public function getQueueAdapter(): QueueAdapterInterface
+    public function getQueueDriver(): QueueDriverInterface
     {
-        return $this->queueAdapter;
+        return $this->queueDriver;
     }
 
-    public function getSchedulerAdapter(): SchedulerAdapterInterface
+    public function getSchedulerDriver(): SchedulerDriverInterface
     {
-        return $this->schedulerAdapter;
+        return $this->schedulerDriver;
     }
 
     public function getClock(): ClockInterface

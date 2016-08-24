@@ -54,10 +54,10 @@ class SchedulerWorker
             $start = clone $now;
             $start = $start->sub($expiry);
         }
-        $receivedCommands = $this->implementation->getSchedulerAdapter()
+        $receivedCommands = $this->implementation->getSchedulerDriver()
             ->receiveDueCommands($now, $throttle, $start);
         foreach ($receivedCommands as $received) {
-            $this->implementation->getQueueAdapter()
+            $this->implementation->getQueueDriver()
                 ->queueCommand(
                     $received->getQueueName(),
                     $received->getId(),

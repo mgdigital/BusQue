@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue;
 
-interface SchedulerAdapterInterface
+interface SchedulerDriverInterface
 {
 
     public function scheduleCommand(string $queueName, string $id, string $serialized, \DateTime $dateTime);
@@ -10,6 +10,13 @@ interface SchedulerAdapterInterface
     public function cancelScheduledCommand(string $queueName, string $id);
 
     public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null);
+
+    /**
+     * @param string $queueName
+     * @param string $id
+     * @return \DateTime|null
+     */
+    public function getScheduledTime(string $queueName, string $id);
 
     /**
      * @param \DateTime $now

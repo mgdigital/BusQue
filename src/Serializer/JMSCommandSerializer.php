@@ -2,8 +2,10 @@
 
 namespace MGDigital\BusQue\Serializer;
 
+use JMS\Serializer\Exception as JMSException;
 use JMS\Serializer\SerializerInterface;
 use MGDigital\BusQue\CommandSerializerInterface;
+use MGDigital\BusQue\Exception\SerializerException;
 
 class JMSCommandSerializer implements CommandSerializerInterface
 {
@@ -21,11 +23,19 @@ class JMSCommandSerializer implements CommandSerializerInterface
 
     public function serialize($command): string
     {
-        return $this->jmsSerializer->serialize($command, $this->format);
+        try {
+            return $this->jmsSerializer->serialize($command, $this->format);
+        } catch (JMSException $e) {
+            throw new SerializerException($e->getMessage(), 0, $e);
+        }
     }
 
     public function unserialize(string $serialized)
     {
-        return $this->jmsSerializer->deserialize($serialized, $this->type, $this->format);
+        try {
+            return $this->jmsSerializer->deserialize($serialized, $this->type, $this->format);
+        } catch (JMSException $e) {
+            throw new SerializerException($e->getMessage(), 0, $e);
+        }
     }
 }

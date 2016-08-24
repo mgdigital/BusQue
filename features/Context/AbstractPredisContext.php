@@ -2,34 +2,17 @@
 
 namespace MGDigital\BusQue\Features\Context;
 
-use MGDigital\BusQue\Predis\PredisAdapter;
-use MGDigital\BusQue\QueueAdapterInterface;
-use MGDigital\BusQue\SchedulerAdapterInterface;
-use Predis\Client;
+use MGDigital\BusQue\Redis\Predis\PredisAdapter;
+use MGDigital\BusQue\Redis\RedisAdapterInterface;
+use Predis\ClientInterface;
 
-abstract class AbstractPredisContext extends AbstractQueueAndSchedulerContext
+abstract class AbstractPredisContext extends AbstractRedisContext
 {
 
-    private $predisAdapter;
-
-    protected function getQueueAdapter(): QueueAdapterInterface
+    public function getRedisAdapter(): RedisAdapterInterface
     {
-        return $this->getPredisAdapter();
+        return new PredisAdapter($this->getClient());
     }
 
-    protected function getSchedulerAdapter(): SchedulerAdapterInterface
-    {
-        return $this->getPredisAdapter();
-    }
-
-    private function getPredisAdapter(): PredisAdapter
-    {
-        if ($this->predisAdapter === null) {
-            $this->predisAdapter = new PredisAdapter($this->getPredisClient());
-        }
-        return $this->predisAdapter;
-    }
-
-    abstract protected function getPredisClient(): Client;
-
+    abstract protected function getClient(): ClientInterface;
 }

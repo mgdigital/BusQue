@@ -18,7 +18,7 @@ final class ScheduledCommandHandlerSpec extends AbstractSpec
     {
         $dateTime = new \DateTime();
         $scheduledCommand = new ScheduledCommand('test_command', $dateTime);
-        $this->schedulerAdapter->scheduleCommand('test_queue', 'test_generated_id', 'serialized', $dateTime)->shouldBeCalled();
+        $this->schedulerDriver->scheduleCommand('test_queue', 'test_generated_id', 'serialized', $dateTime)->shouldBeCalled();
         $this->handleScheduledCommand($scheduledCommand);
     }
 }

@@ -1,10 +1,9 @@
-local queue, id, message = ARGV[1], ARGV[2], ARGV[3]
+local ns, queue, id, message = ARGV[1], ARGV[2], ARGV[3], ARGV[4]
 
-redis.call('SADD', ':queues', queue)
-redis.call('HSET', ':'..queue..':messages', id, message)
+redis.call('SADD', ns..':queues', queue)
+redis.call('HSET', ns..':'..queue..':messages', id, message)
 
-if redis.call('SISMEMBER', ':'..queue..':reserved_ids', id) == 0 then
-    redis.call('SADD', ':'..queue..':reserved_ids', id)
-    redis.call('HSET', ':'..queue..':statuses', id, 'queued')
-    redis.call('LPUSH', ':'..queue..':queue', id)
+if redis.call('SISMEMBER', ns..':'..queue..':queued_ids', id) == 0 then
+    redis.call('SADD', ns..':'..queue..':queued_ids', id)
+    redis.call('LPUSH', ns..':'..queue..':queue', id)
 end

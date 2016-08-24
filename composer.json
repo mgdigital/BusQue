@@ -12,17 +12,18 @@
     "require": {
         "php": ">=7.0",
         "league/tactician": "~1.0",
-        "predis/predis": "~1.0",
         "psr/log": "~1.0"
     },
     "require-dev": {
         "behat/behat": "~3.0",
-        "henrikbjorn/phpspec-code-coverage": "^2.0",
-        "phpspec/phpspec": "~2.5",
-        "phpunit/phpunit": "~4.3",
+        "henrikbjorn/phpspec-code-coverage": "^3.0",
+        "phpspec/phpspec": "~3.0",
+        "phpunit/phpunit": "~5.1",
+        "predis/predis": "~1.0",
         "squizlabs/php_codesniffer": "~2.6"
     },
     "suggest": {
+        "ext-redis": "To use the better PHPRedis driver",
         "rybakit/msgpack": "For serialization to MessagePack format",
         "jms/serializer": "For serialization to json or XML"
     },

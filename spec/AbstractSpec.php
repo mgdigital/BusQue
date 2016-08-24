@@ -8,9 +8,9 @@ use MGDigital\BusQue\CommandIdGeneratorInterface;
 use MGDigital\BusQue\CommandSerializerInterface;
 use MGDigital\BusQue\ErrorHandlerInterface;
 use MGDigital\BusQue\Implementation;
-use MGDigital\BusQue\QueueAdapterInterface;
+use MGDigital\BusQue\QueueDriverInterface;
 use MGDigital\BusQue\QueueResolverInterface;
-use MGDigital\BusQue\SchedulerAdapterInterface;
+use MGDigital\BusQue\SchedulerDriverInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -20,8 +20,8 @@ abstract class AbstractSpec extends ObjectBehavior
     protected $queueResolver;
     protected $commandSerializer;
     protected $commandIdGenerator;
-    protected $queueAdapter;
-    protected $schedulerAdapter;
+    protected $queueDriver;
+    protected $schedulerDriver;
     protected $clock;
     protected $commandBusAdapter;
     protected $errorHandler;
@@ -31,8 +31,8 @@ abstract class AbstractSpec extends ObjectBehavior
         $queueResolver,
         $commandSerializer,
         $commandIdGenerator,
-        $queueAdapter,
-        $schedulerAdapter,
+        $queueDriver,
+        $schedulerDriver,
         $clock,
         $commandBusAdapter,
         $errorHandler,
@@ -48,9 +48,9 @@ abstract class AbstractSpec extends ObjectBehavior
         $commandIdGenerator->beADoubleOf(CommandIdGeneratorInterface::class);
         $commandIdGenerator->generateId(Argument::any())->willReturn('test_generated_id');
 
-        $queueAdapter->beADoubleOf(QueueAdapterInterface::class);
+        $queueDriver->beADoubleOf(QueueDriverInterface::class);
 
-        $schedulerAdapter->beADoubleOf(SchedulerAdapterInterface::class);
+        $schedulerDriver->beADoubleOf(SchedulerDriverInterface::class);
 
         $clock->beADoubleOf(ClockInterface::class);
 
@@ -62,8 +62,8 @@ abstract class AbstractSpec extends ObjectBehavior
         $implementation->getQueueResolver()->willReturn($queueResolver);
         $implementation->getCommandSerializer()->willReturn($commandSerializer);
         $implementation->getCommandIdGenerator()->willReturn($commandIdGenerator);
-        $implementation->getQueueAdapter()->willReturn($queueAdapter);
-        $implementation->getSchedulerAdapter()->willReturn($schedulerAdapter);
+        $implementation->getQueueDriver()->willReturn($queueDriver);
+        $implementation->getSchedulerDriver()->willReturn($schedulerDriver);
         $implementation->getClock()->willReturn($clock);
         $implementation->getCommandBusAdapter()->willReturn($commandBusAdapter);
         $implementation->getErrorHandler()->willReturn($errorHandler);
@@ -71,8 +71,8 @@ abstract class AbstractSpec extends ObjectBehavior
         $this->queueResolver = $queueResolver;
         $this->commandSerializer = $commandSerializer;
         $this->commandIdGenerator = $commandIdGenerator;
-        $this->queueAdapter = $queueAdapter;
-        $this->schedulerAdapter = $schedulerAdapter;
+        $this->queueDriver = $queueDriver;
+        $this->schedulerDriver = $schedulerDriver;
         $this->clock = $clock;
         $this->commandBusAdapter = $commandBusAdapter;
         $this->errorHandler = $errorHandler;
@@ -85,5 +85,4 @@ abstract class AbstractSpec extends ObjectBehavior
     {
         return [$this->implementation];
     }
-
 }

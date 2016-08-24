@@ -6,6 +6,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use MGDigital\BusQue\ClockInterface;
 use MGDigital\BusQue\CommandBusAdapterInterface;
 use MGDigital\BusQue\CommandIdGeneratorInterface;
+use MGDigital\BusQue\ErrorHandlerInterface;
 use MGDigital\BusQue\Exception\TimeoutException;
 use MGDigital\BusQue\Handler\QueuedCommandHandler;
 use MGDigital\BusQue\Handler\ScheduledCommandHandler;
@@ -20,7 +21,7 @@ use Prophecy\Argument;
 use Prophecy\Prophet;
 use Psr\Log\NullLogger;
 
-abstract class AbstractFeatureContext implements SnippetAcceptingContext
+abstract class AbstractBaseContext implements SnippetAcceptingContext
 {
 
     /**
@@ -28,10 +29,34 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     protected $implementation;
 
+    /**
+     * @var Prophet
+     */
     protected $prophet;
+
+    /**
+     * @var CommandBusAdapterInterface
+     */
     protected $commandBus;
+
+    /**
+     * @var CommandIdGeneratorInterface
+     */
     protected $commandIdGenerator;
-    protected $queueNameResolver;
+
+    /**
+     * @var QueueResolverInterface
+     */
+    protected $queueResolver;
+
+    /**
+     * @var ErrorHandlerInterface
+     */
+    protected $errorHandler;
+
+    /**
+     * @var ClockInterface
+     */
     protected $clock;
 
     abstract protected function getImplementation(): Implementation;
@@ -45,22 +70,24 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
         $this->commandBus = $this->prophet->prophesize(CommandBusAdapterInterface::class);
         $this->commandIdGenerator = $this->prophet->prophesize(CommandIdGeneratorInterface::class);
         $this->commandIdGenerator->generateId(Argument::any())->willReturn('test_command_id');
-        $this->queueNameResolver = $this->prophet->prophesize(QueueResolverInterface::class);
-        $this->queueNameResolver->resolveQueueName(Argument::any())->willReturn('test_queue');
+        $this->queueResolver = $this->prophet->prophesize(QueueResolverInterface::class);
+        $this->queueResolver->resolveQueueName(Argument::any())->willReturn('test_queue');
+        $this->errorHandler = $this->prophet->prophesize(ErrorHandlerInterface::class);
+        $this->errorHandler->handleCommandError(Argument::any(), Argument::type(\Throwable::class))->willReturn(null);
         $this->clock = $this->prophet->prophesize(ClockInterface::class);
         $implementation = $this->getImplementation();
         $this->implementation = new Implementation(
-            $this->queueNameResolver->reveal(),
+            $this->queueResolver->reveal(),
             $implementation->getCommandSerializer(),
             $this->commandIdGenerator->reveal(),
-            $implementation->getQueueAdapter(),
-            $implementation->getSchedulerAdapter(),
+            $implementation->getQueueDriver(),
+            $implementation->getSchedulerDriver(),
             $this->clock->reveal(),
             $this->commandBus->reveal(),
-            new LoggingErrorHandler(new NullLogger())
+            $this->errorHandler->reveal()
         );
-        $this->implementation->getQueueAdapter()->clearQueue('test_queue');
-        $this->implementation->getSchedulerAdapter()->clearSchedule();
+        $this->implementation->getQueueDriver()->deleteQueue('test_queue');
+        $this->implementation->getSchedulerDriver()->clearSchedule();
     }
 
     /**
@@ -68,7 +95,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function theQueueIsEmpty()
     {
-        $this->implementation->getQueueAdapter()->clearQueue('test_queue');
+        $this->implementation->getQueueDriver()->deleteQueue('test_queue');
         $this->thereShouldBeNCommandsInTheQueue(0);
     }
 
@@ -77,7 +104,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function thereShouldBeNCommandsInTheQueue(int $arg1)
     {
-        $count = $this->implementation->getQueueAdapter()->getQueuedCount('test_queue');
+        $count = $this->implementation->getQueueDriver()->getQueuedCount('test_queue');
         \PHPUnit_Framework_Assert::assertEquals($count, $arg1);
     }
 
@@ -104,12 +131,21 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
     }
 
     /**
-     * @Then :arg1 should be in the list of queued IDs
+     * @Then the command should be queued
      */
-    public function shouldBeInTheListOfQueuedIds($arg1)
+    public function theCommandShouldBeQueued()
     {
-        $queuedIds = $this->implementation->getQueueAdapter()->getQueuedIds('test_queue');
-        \PHPUnit_Framework_Assert::assertTrue(in_array($arg1, $queuedIds));
+        $this->theCommandWithIdArgShouldBQueued('test_command_id');
+    }
+
+    /**
+     * @Then the command with ID :arg1 should be queued
+     */
+    public function theCommandWithIdArgShouldBQueued($arg1)
+    {
+        \PHPUnit_Framework_Assert::assertTrue(
+            $this->implementation->getQueueDriver()->isIdQueued('test_queue', $arg1)
+        );
     }
 
     /**
@@ -148,20 +184,20 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
     }
 
     /**
-     * @Then the command should have a status of :arg1
+     * @Then the command :arg1 should not have run
      */
-    public function theCommandShouldHaveAStatusOf($arg1)
+    public function theCommandArgShouldNotHaveRun($arg1)
     {
-        $this->theCommandWithIdShouldHaveAStatusOf('test_command_id', $arg1);
+        $this->commandBus->handle($arg1, true)->shouldNotHaveBeenCalled();
     }
 
     /**
-     * @Then the command with ID :arg1 should have a status of :arg2
+     * @Then the command :arg1 should have failed
      */
-    public function theCommandWithIdShouldHaveAStatusOf($arg1, $arg2)
+    public function theCommandArgShouldHaveBeenFailed($arg1)
     {
-        $status = $this->implementation->getQueueAdapter()->getCommandStatus('test_queue', $arg1);
-        \PHPUnit_Framework_Assert::assertEquals($status, $arg2);
+        $this->errorHandler->handleCommandError('test_command', Argument::type(\Exception::class))
+            ->shouldHaveBeenCalled();
     }
 
     /**
@@ -169,7 +205,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function theCommandWithIdShouldResolveTo($arg1, $arg2)
     {
-        $serialized = $this->implementation->getQueueAdapter()->readCommand('test_queue', $arg1);
+        $serialized = $this->implementation->getQueueDriver()->readCommand('test_queue', $arg1);
         $command = $this->implementation->getCommandSerializer()->unserialize($serialized);
         \PHPUnit_Framework_Assert::assertEquals($command, $arg2);
     }
@@ -179,7 +215,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function iCancel($arg1)
     {
-        $this->implementation->getQueueAdapter()->purgeCommand('test_queue', $arg1);
+        $this->implementation->getQueueDriver()->purgeCommand('test_queue', $arg1);
     }
 
     /**
@@ -206,6 +242,16 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
     }
 
     /**
+     * @Then the command with ID :arg1 should be scheduled at :arg2::arg3
+     */
+    public function theCommandWithIdShouldBeScheduledAt($arg1, $arg2, $arg3)
+    {
+        $time = $this->implementation->getSchedulerDriver()->getScheduledTime('test_queue', $arg1);
+        \PHPUnit_Framework_Assert::assertInstanceOf(\DateTime::class, $time);
+        \PHPUnit_Framework_Assert::assertEquals("$arg2:$arg3", $time->format('H:i'));
+    }
+
+    /**
      * @Given the time is :arg1::arg2
      */
     public function theTimeIs($arg1, $arg2)
@@ -229,7 +275,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function iClearTheQueue()
     {
-        $this->implementation->getQueueAdapter()->clearQueue('test_queue');
+        $this->implementation->getQueueDriver()->deleteQueue('test_queue');
     }
 
     /**
@@ -237,7 +283,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function iDeleteTheQueue()
     {
-        $this->implementation->getQueueAdapter()->deleteQueue('test_queue');
+        $this->implementation->getQueueDriver()->deleteQueue('test_queue');
     }
 
     /**
@@ -245,7 +291,7 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function theQueueShouldHaveBeenDeleted()
     {
-        $queueNames = $this->implementation->getQueueAdapter()->getQueueNames();
+        $queueNames = $this->implementation->getQueueDriver()->getQueueNames();
         \PHPUnit_Framework_Assert::assertFalse(in_array('test_queue', $queueNames));
     }
 
@@ -254,6 +300,6 @@ abstract class AbstractFeatureContext implements SnippetAcceptingContext
      */
     public function iClearTheSchedule()
     {
-        $this->implementation->getSchedulerAdapter()->clearSchedule();
+        $this->implementation->getSchedulerDriver()->clearSchedule();
     }
 }

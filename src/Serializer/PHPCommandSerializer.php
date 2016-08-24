@@ -3,6 +3,7 @@
 namespace MGDigital\BusQue\Serializer;
 
 use MGDigital\BusQue\CommandSerializerInterface;
+use MGDigital\BusQue\Exception\SerializerException;
 
 class PHPCommandSerializer implements CommandSerializerInterface
 {
@@ -14,6 +15,10 @@ class PHPCommandSerializer implements CommandSerializerInterface
 
     public function unserialize(string $serialized)
     {
-        return unserialize($serialized);
+        $unserialized = @unserialize($serialized);
+        if (false === $unserialized) {
+            throw new SerializerException();
+        }
+        return $unserialized;
     }
 }

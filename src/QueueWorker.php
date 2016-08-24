@@ -2,6 +2,7 @@
 
 namespace MGDigital\BusQue;
 
+use MGDigital\BusQue\Exception\SerializerException;
 use MGDigital\BusQue\Exception\TimeoutException;
 
 class QueueWorker
@@ -29,7 +30,7 @@ class QueueWorker
     private function iterate(string $queueName, int $time = null)
     {
         try {
-            $received = $this->implementation->getQueueAdapter()
+            $received = $this->implementation->getQueueDriver()
                 ->awaitCommand($queueName, $time);
         } catch (TimeoutException $e) {
             return;
@@ -38,25 +39,24 @@ class QueueWorker
         try {
             $command = $this->implementation->getCommandSerializer()
                 ->unserialize($received->getSerialized());
-            $this->implementation->getCommandBusAdapter()
-                ->handle($command, true);
-            $this->implementation->getQueueAdapter()
-                ->setCommandCompleted($received->getQueueName(), $received->getId());
-        } catch (\Throwable $exception) {
-            $this->implementation->getQueueAdapter()
-                ->setCommandFailed($queueName, $received->getId());
-            if ($command === null) {
-                $this->implementation->getErrorHandler()
-                    ->handleUnserializationError(
-                        $queueName,
-                        $received->getId(),
-                        $received->getSerialized(),
-                        $exception
-                    );
-            } else {
+            try {
+                $this->implementation->getCommandBusAdapter()
+                    ->handle($command, true);
+            } catch (\Throwable $exception) {
                 $this->implementation->getErrorHandler()
                     ->handleCommandError($command, $exception);
             }
+        } catch (SerializerException $exception) {
+            $this->implementation->getErrorHandler()
+                ->handleUnserializationError(
+                    $queueName,
+                    $received->getId(),
+                    $received->getSerialized(),
+                    $exception
+                );
+        } finally {
+            $this->implementation->getQueueDriver()
+                ->completeCommand($received->getQueueName(), $received->getId());
         }
     }
 }
