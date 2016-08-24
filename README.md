@@ -1,7 +1,7 @@
 BusQue
 ======
 
-[![Build Status](https://travis-ci.org/mgdigital/BusQue.svg?branch=master)](https://travis-ci.org/mgdigital/BusQue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mgdigital/BusQue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mgdigital/BusQue/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/425b7104-519a-4292-abe2-bfebccee643e/small.png)](https://insight.sensiolabs.com/projects/425b7104-519a-4292-abe2-bfebccee643e)
+[![Build Status](https://travis-ci.org/mgdigital/BusQue.svg?branch=master)](https://travis-ci.org/mgdigital/BusQue) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mgdigital/BusQue/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mgdigital/BusQue/?branch=master) [![Code Coverage](https://scrutinizer-ci.com/g/mgdigital/BusQue/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/mgdigital/BusQue/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/425b7104-519a-4292-abe2-bfebccee643e/small.png)](https://insight.sensiolabs.com/projects/425b7104-519a-4292-abe2-bfebccee643e)
 
 ### A flexible, modern command queue and scheduler for PHP7, built on Redis
 
@@ -56,8 +56,8 @@ $serializer = new BusQue\Serializer\PHPCommandSerializer();
 $idGenerator = new BusQue\IdGenerator\Md5IdGenerator($serializer);
 
 $implementation = new BusQue\Implementation(
-    // Results in queues named by the command classname, backslashes replaced with underscores:
-    new BusQue\QueueResolver\ClassNameQueueResolver(), 
+    // Puts all commands into the "default" queue:
+    new BusQue\QueueResolver\SimpleQueueResolver('default'), 
     $serializer,
     $idGenerator,
     // The Redis driver is used as both the queue and scheduler:
@@ -99,7 +99,7 @@ $busQue->queueCommand($command);
 ```php
 <?php
 
-$busQue->workQueue('SendEmailCommand'); // Hello Joe!
+$busQue->workQueue('default'); // Hello Joe!
 ```
 
 Or in your Symfony app run `app/console busque:queue_worker SendEmailCommand`
