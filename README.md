@@ -247,13 +247,13 @@ Run the phpspec test suite:
 
 And run the Behat acceptance suite:
 
-*Warning: this will attempt to write to your localhost Redis instance by default.* You may prefer to configure an alternate test client by providing an alternate `FeatureContext` class.
-
     bin/behat
 
 By default the Behat suite will test integration with PHPRedis. Integration with Predis can also be tested:
 
     bin/behat --profile predis
+
+These tests will attempt to write to a Redis instance at `redis://busque-redis:6379` by default. You can configure an alternate test client by providing an alternate `FeatureContext` class extending either `BusQue\Features\Context\AbstractPHPRedisContext` or `BusQue\Features\Context\AbstractPredisContext`.
 
 
 Docker
