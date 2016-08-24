@@ -3,8 +3,8 @@
 namespace MGDigital\BusQue\Features\Context;
 
 use League\Tactician\CommandBus;
+use MGDigital\BusQue\IdGenerator\Md5IdGenerator;
 use MGDigital\BusQue\QueueResolver\ClassNameQueueResolver;
-use MGDigital\BusQue\IdGenerator\ObjectHashIdGenerator;
 use MGDigital\BusQue\Implementation;
 use MGDigital\BusQue\Logging\LoggingErrorHandler;
 use MGDigital\BusQue\QueueDriverInterface;
@@ -19,10 +19,12 @@ abstract class AbstractQueueAndSchedulerContext extends AbstractBaseContext
 
     protected function getImplementation(): Implementation
     {
+        $serializer = new PHPCommandSerializer();
+        $idGenerator = new Md5IdGenerator($serializer);
         return new Implementation(
             new ClassNameQueueResolver(),
-            new PHPCommandSerializer(),
-            new ObjectHashIdGenerator(),
+            $serializer,
+            $idGenerator,
             $this->getQueueAdapter(),
             $this->getSchedulerAdapter(),
             new SystemClock(),
