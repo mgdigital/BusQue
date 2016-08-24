@@ -24,7 +24,6 @@ abstract class AbstractSpec extends ObjectBehavior
     protected $schedulerDriver;
     protected $clock;
     protected $commandBusAdapter;
-    protected $errorHandler;
     protected $implementation;
 
     public function let(
@@ -34,9 +33,7 @@ abstract class AbstractSpec extends ObjectBehavior
         $queueDriver,
         $schedulerDriver,
         $clock,
-        $commandBusAdapter,
-        $errorHandler,
-        $implementation
+        $commandBusAdapter
     ) {
 
         $queueResolver->beADoubleOf(QueueResolverInterface::class);
@@ -56,17 +53,15 @@ abstract class AbstractSpec extends ObjectBehavior
 
         $commandBusAdapter->beADoubleOf(CommandBusAdapterInterface::class);
 
-        $errorHandler->beADoubleOf(ErrorHandlerInterface::class);
-
-        $implementation->beADoubleOf(Implementation::class);
-        $implementation->getQueueResolver()->willReturn($queueResolver);
-        $implementation->getCommandSerializer()->willReturn($commandSerializer);
-        $implementation->getCommandIdGenerator()->willReturn($commandIdGenerator);
-        $implementation->getQueueDriver()->willReturn($queueDriver);
-        $implementation->getSchedulerDriver()->willReturn($schedulerDriver);
-        $implementation->getClock()->willReturn($clock);
-        $implementation->getCommandBusAdapter()->willReturn($commandBusAdapter);
-        $implementation->getErrorHandler()->willReturn($errorHandler);
+        $implementation = new Implementation(
+            $queueResolver->getWrappedObject(),
+            $commandSerializer->getWrappedObject(),
+            $commandIdGenerator->getWrappedObject(),
+            $queueDriver->getWrappedObject(),
+            $schedulerDriver->getWrappedObject(),
+            $clock->getWrappedObject(),
+            $commandBusAdapter->getWrappedObject()
+        );
 
         $this->queueResolver = $queueResolver;
         $this->commandSerializer = $commandSerializer;
@@ -75,7 +70,6 @@ abstract class AbstractSpec extends ObjectBehavior
         $this->schedulerDriver = $schedulerDriver;
         $this->clock = $clock;
         $this->commandBusAdapter = $commandBusAdapter;
-        $this->errorHandler = $errorHandler;
         $this->implementation = $implementation;
 
         $this->beConstructedWith(...$this->getConstructorArguments());

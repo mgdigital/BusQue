@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue;
 
-class Implementation
+final class Implementation
 {
 
     private $queueResolver;
@@ -12,7 +12,6 @@ class Implementation
     private $schedulerDriver;
     private $clock;
     private $commandBusAdapter;
-    private $errorHandler;
 
     public function __construct(
         QueueResolverInterface $queueResolver,
@@ -21,8 +20,7 @@ class Implementation
         QueueDriverInterface $queueDriver,
         SchedulerDriverInterface $schedulerDriver,
         ClockInterface $clock,
-        CommandBusAdapterInterface $commandBusAdapter,
-        ErrorHandlerInterface $errorHandler
+        CommandBusAdapterInterface $commandBusAdapter
     ) {
         $this->queueResolver = $queueResolver;
         $this->commandSerializer = $commandSerializer;
@@ -31,7 +29,6 @@ class Implementation
         $this->schedulerDriver = $schedulerDriver;
         $this->clock = $clock;
         $this->commandBusAdapter = $commandBusAdapter;
-        $this->errorHandler = $errorHandler;
     }
 
     public function getQueueResolver(): QueueResolverInterface
@@ -67,10 +64,5 @@ class Implementation
     public function getCommandBusAdapter(): CommandBusAdapterInterface
     {
         return $this->commandBusAdapter;
-    }
-
-    public function getErrorHandler(): ErrorHandlerInterface
-    {
-        return $this->errorHandler;
     }
 }
