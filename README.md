@@ -66,9 +66,7 @@ $implementation = new BusQue\Implementation(
     // Always returns the current time:
     new BusQue\SystemClock(),
     // Inject your command bus here:
-    new BusQue\Tactician\CommandBusAdapter($commandBus),
-    // Log any errors or create an alternate error handler:
-    new BusQue\Logging\LoggingErrorHandler(new Psr\Log\NullLogger())
+    new BusQue\Tactician\CommandBusAdapter($commandBus)
 );
 
 $busQue = new BusQue\BusQue($implementation);
