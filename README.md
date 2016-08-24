@@ -7,7 +7,7 @@ BusQue
 
 I built BusQue because I found a lack of choice of simple message queues for medium-sized PHP applications.
 
-The name BusQue signifies Command Bus + Message Queue. It was designed to be used in conjunction with [Tactician](https://github.com/thephpleague/tactician) and [Redis](http://redis.io/) using either the [PHPRedis](https://github.com/phpredis/phpredis) or [Predis](https://github.com/nrk/predis) clients, along with a serializer such as PHP serialize() or [JMS Serializer](https://github.com/schmittjoh/serializer), but is open to replacement with alternate adapters.
+The name BusQue signifies Command Bus + Message Queue. It was designed to be used in conjunction with [Tactician](https://github.com/thephpleague/tactician) and [Redis](http://redis.io/) using either the [PHPRedis](https://github.com/phpredis/phpredis) or [Predis](https://github.com/nrk/predis) clients, along with a serializer such as PHP serialize(), but is open to replacement with alternate adapters.
 
 One key feature I found missing in other queues is the ability to assign a unique ID to a job, allowing the same job to be queued multiple times but have it only execute once after the last insertion.
 
@@ -39,7 +39,7 @@ To use BusQue you first need to instantiate an instance of `BusQue\Implementatio
 use MGDigital\BusQue as BusQue;
 
 // The preferred client is PHPRedis:
-$client = new \Redis();
+$client = new Redis();
 $adapter = new BusQue\Redis\PHPRedis\PHPRedisAdapter($client);
 
 // A Predis adepter is included, although Predis can have issues when used in long-running processes.
@@ -49,13 +49,17 @@ $adapter = new BusQue\Redis\PHPRedis\PHPRedisAdapter($client);
 
 $driver = new BusQue\Redis\RedisDriver($adapter);
 
+// The PHP serializer should fit most use cases:
+$serializer = new BusQue\Serializer\PHPCommandSerializer();
+
+// The MD5 generator creates an ID unique to the serialized command:
+$idGenerator = new BusQue\IdGenerator\Md5IdGenerator($serializer);
+
 $implementation = new BusQue\Implementation(
     // Results in queues named by the command classname, backslashes replaced with underscores:
-    new BusQue\QueueResolver\ClassNameQueueResolver(),
-    // You might want to replace this with a more advanced serializer: 
-    new BusQue\Serializer\PHPCommandSerializer(),
-    // Commands without an explicit ID will have spl_object_hash() performed to generate the ID:
-    new BusQue\IdGenerator\ObjectHashIdGenerator(),
+    new BusQue\QueueResolver\ClassNameQueueResolver(), 
+    $serializer,
+    $idGenerator,
     // The Redis driver is used as both the queue and scheduler:
     $driver,
     $driver,
@@ -69,6 +73,7 @@ $implementation = new BusQue\Implementation(
 
 $busQue = new BusQue\BusQue($implementation);
 ```
+
 The `BusQue\Handler\QueuedCommandHandler` and `BusQue\Handler\ScheduledCommandHandler` classes also needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
 
 If you're using the Symfony bundle, then all of the above is done for you, and you can just get the `busque` service from the container.
@@ -162,16 +167,8 @@ This behaviour works as follows:
 - When the queue encounters a command whose ID is already in progress, the command will be re-inserted at the end of the queue
 - When scheduling a command with an ID which is already scheduled, the originally scheduled command will be replaced with the newly scheduled command
 
-You could also configure a custom ID generator for this type of command, Then a consistent ID would be generated automatically wherever this command is issued from in your app. The included `Md5IdGenerator` will have this effect, generating an ID based on the MD5 hash of the serialized command:
+Using the MD5IdGenerator will generate an ID consistently unique to the command and its payload. An alternate ID generator could be used if different behaviour is needed.
 
-```php
-<?php
-
-$serializer = new BusQue\Serializer\PHPCommandSerializer();
-
-// Replace the ID generator in the configuration above:
-$idGenerator = new BusQue\IdGenerator\Md5IdGenerator($serializer);
-```
 
 ### Checking the length of a queue
 
@@ -243,7 +240,7 @@ This method returns an unserialized command from BusQue based on its queue name 
 $command = $busQue->getCommand($queueName, $uniqueCommandId);
 ```
 
-*Further convenience commands can be found in the `BusQue\BusQue` class.*
+*Further convenience methods can be found in the `BusQue\BusQue` class.*
 
 Tests
 -----
@@ -276,6 +273,7 @@ A basic docker environment is included for testing.
 
 cd docker
 docker-compose -f ./docker-compose.yml up
+docker exec -ti busque-php composer install
 docker exec -ti busque-php bin/behat
 ```
 
