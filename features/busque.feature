@@ -39,7 +39,6 @@ Feature: Command Bus Queue
     Then the command should be queued
     When I run the queue worker
     Then there should be 0 commands in the queue
-    And the command "test_command" should have failed
 
   Scenario: Cancelling a command
     Given the queue is empty

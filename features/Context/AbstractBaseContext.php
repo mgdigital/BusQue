@@ -192,15 +192,6 @@ abstract class AbstractBaseContext implements SnippetAcceptingContext
     }
 
     /**
-     * @Then the command :arg1 should have failed
-     */
-    public function theCommandArgShouldHaveBeenFailed($arg1)
-    {
-        $this->errorHandler->handleCommandError('test_command', Argument::type(\Exception::class))
-            ->shouldHaveBeenCalled();
-    }
-
-    /**
      * @Then the command with ID :arg1 should resolve to :arg2
      */
     public function theCommandWithIdShouldResolveTo($arg1, $arg2)
