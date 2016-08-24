@@ -6,13 +6,11 @@ use League\Tactician\CommandBus;
 use MGDigital\BusQue\IdGenerator\Md5IdGenerator;
 use MGDigital\BusQue\QueueResolver\ClassNameQueueResolver;
 use MGDigital\BusQue\Implementation;
-use MGDigital\BusQue\Logging\LoggingErrorHandler;
 use MGDigital\BusQue\QueueDriverInterface;
 use MGDigital\BusQue\SchedulerDriverInterface;
 use MGDigital\BusQue\Serializer\PHPCommandSerializer;
 use MGDigital\BusQue\SystemClock;
 use MGDigital\BusQue\Tactician\CommandBusAdapter;
-use Psr\Log\NullLogger;
 
 abstract class AbstractQueueAndSchedulerContext extends AbstractBaseContext
 {
@@ -28,8 +26,7 @@ abstract class AbstractQueueAndSchedulerContext extends AbstractBaseContext
             $this->getQueueAdapter(),
             $this->getSchedulerAdapter(),
             new SystemClock(),
-            new CommandBusAdapter(new CommandBus([])),
-            new LoggingErrorHandler(new NullLogger())
+            new CommandBusAdapter(new CommandBus([]))
         );
     }
 
