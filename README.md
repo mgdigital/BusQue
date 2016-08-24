@@ -39,8 +39,8 @@ To use BusQue you first need to instantiate an instance of `BusQue\Implementatio
 use MGDigital\BusQue as BusQue;
 
 // The preferred client is PHPRedis:
-$redis = new \Redis();
-$adapter = new BusQue\Redis\PHPRedis\PHPRedisAdapter($redis);
+$client = new \Redis();
+$adapter = new BusQue\Redis\PHPRedis\PHPRedisAdapter($client);
 
 // A Predis adepter is included, although Predis can have issues when used in long-running processes.
 // Using the BusQue\Redis\Predis\Client class prevents an exception when the Client::getIterator() method is called.
