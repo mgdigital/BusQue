@@ -8,13 +8,6 @@ use MGDigital\BusQue\Exception\TimeoutException;
 interface QueueDriverInterface
 {
 
-    const STATUS_SCHEDULED = 'scheduled';
-    const STATUS_QUEUED = 'queued';
-    const STATUS_IN_PROGRESS = 'in_progress';
-    const STATUS_COMPLETED = 'completed';
-    const STATUS_FAILED = 'failed';
-    const STATUS_NOT_FOUND = 'not_found';
-
     public function queueCommand(string $queueName, string $id, string $serialized);
 
     public function completeCommand(string $queueName, string $id);

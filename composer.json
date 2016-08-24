@@ -23,9 +23,7 @@
         "squizlabs/php_codesniffer": "~2.6"
     },
     "suggest": {
-        "ext-redis": "To use the better PHPRedis driver",
-        "rybakit/msgpack": "For serialization to MessagePack format",
-        "jms/serializer": "For serialization to json or XML"
+        "ext-redis": "To use the better PHPRedis driver"
     },
     "config": {
         "bin-dir": "bin"
