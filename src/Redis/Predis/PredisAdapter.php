@@ -53,6 +53,15 @@ class PredisAdapter implements RedisAdapterInterface
         }
     }
 
+    public function sRem(string $key, array $members)
+    {
+        try {
+            $this->client->srem($key, $members);
+        } catch (PredisConnectionException $e) {
+            throw new RedisException();
+        }
+    }
+
     public function sIsMember(string $key, string $value): bool
     {
         try {

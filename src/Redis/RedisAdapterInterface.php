@@ -18,6 +18,8 @@ interface RedisAdapterInterface
 
     public function sAdd(string $key, array $members);
 
+    public function sRem(string $key, array $members);
+
     public function sIsMember(string $key, string $value): bool;
 
     public function sMembers(string $key): array;

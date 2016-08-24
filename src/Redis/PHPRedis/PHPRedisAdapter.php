@@ -51,6 +51,15 @@ class PHPRedisAdapter implements RedisAdapterInterface
         }
     }
 
+    public function sRem(string $key, array $members)
+    {
+        try {
+            $this->redis->sRem($key, ...$members);
+        } catch (\RedisException $e) {
+            throw new RedisException();
+        }
+    }
+
     public function sIsMember(string $key, string $value): bool
     {
         try {

@@ -48,8 +48,7 @@ class RedisDriverSpec extends ObjectBehavior
 
     public function it_can_acknowledge_a_completed_command()
     {
-        $path = $this->getScriptPath('acknowledge_message');
-        $this->adapter->evalScript($path, ['test', 'test', 'test'])->shouldBeCalled();
+        $this->adapter->sRem('test:test:consuming', ['test'])->shouldBeCalled();
         $this->completeCommand('test', 'test');
     }
 

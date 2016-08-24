@@ -63,7 +63,7 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
 
     public function completeCommand(string $queueName, string $id)
     {
-        $this->evalScript('acknowledge_message', [$this->namespace, $queueName, $id]);
+        $this->adapter->sRem("{$this->namespace}:{$queueName}:consuming", [ $id ]);
     }
 
     public function putQueue(string $queueName)
