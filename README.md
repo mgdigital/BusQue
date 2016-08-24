@@ -253,6 +253,9 @@ And run the Behat acceptance suite:
 
 By default the Behat suite will test integration with PHPRedis. Integration with Predis can also be tested:
 
+   bin/behat --profile predis
+
+
 Docker
 ------
 
