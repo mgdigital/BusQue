@@ -7,7 +7,7 @@ interface RedisAdapterInterface
 
     public function ping();
 
-    public function bRPopLPush(string $source, string $destination, int $timeout = null);
+    public function bRPopLPush(string $source, string $destination, int $timeout);
 
     /**
      * @param string $key

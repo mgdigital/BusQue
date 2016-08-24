@@ -26,7 +26,7 @@ class PredisAdapter implements RedisAdapterInterface
         }
     }
 
-    public function bRPopLPush(string $source, string $destination, int $timeout = null)
+    public function bRPopLPush(string $source, string $destination, int $timeout)
     {
         try {
             return $this->client->brpoplpush($source, $destination, $timeout);
