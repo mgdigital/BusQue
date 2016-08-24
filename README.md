@@ -276,7 +276,7 @@ A basic docker environment is included for testing.
 
 cd docker
 docker-compose -f ./docker-compose.yml up
-docker exec -ti busque-php bin/behat -v
+docker exec -ti busque-php bin/behat
 ```
 
 Warnings
