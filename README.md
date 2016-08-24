@@ -147,7 +147,16 @@ $uniqueCommandId = 'SyncStock' . $productId;
 $commandBus->handle(new BusQue\QueuedCommand($command, $uniqueCommandId));
 ```
 
-When you don't specify a unique command ID, one will be generated automatically. You could also configure a custom ID generator for this type of command, Then a consistent ID would be generated wherever this command is issued from in your app.
+When you don't specify a unique command ID, one will be generated automatically. You could also configure a custom ID generator for this type of command, Then a consistent ID would be generated wherever this command is issued from in your app. The included `Md5IdGenerator` will have this effect, generating an ID based on the MD5 hash of the serialized command:
+
+```php
+<?php
+
+$serializer = new BusQue\Serializer\PHPCommandSerializer();
+
+// Replace the ID generator in the configuration above:
+$idGenerator = new BusQue\IdGenerator\Md5IdGenerator($serializer);
+```
 
 What if the queue is busy and hasn't had time to process this command, before the stock level of this product changes a second time? The last thing we want is a duplicate of this message going into the queue, the stock level still only needs syncing once.
 
