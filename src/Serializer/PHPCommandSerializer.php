@@ -15,10 +15,14 @@ class PHPCommandSerializer implements CommandSerializerInterface
 
     public function unserialize(string $serialized)
     {
-        $unserialized = @unserialize($serialized);
-        if (false === $unserialized) {
-            throw new SerializerException();
-        }
+        set_error_handler([$this, 'handleError']);
+        $unserialized = unserialize($serialized);
+        restore_error_handler();
         return $unserialized;
+    }
+
+    private function handleError()
+    {
+        throw new SerializerException();
     }
 }
