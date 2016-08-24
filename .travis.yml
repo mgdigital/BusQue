@@ -14,9 +14,13 @@ matrix:
 services:
   - redis-server
 
+addons:
+  hosts:
+    - busque-php
+    - busque-redis
+
 before_install:
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - sudo echo "127.0.0.1 busque-redis busque-php" >> /etc/hosts
   - composer selfupdate
 
 install:
