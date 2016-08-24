@@ -162,7 +162,7 @@ This behaviour works as follows:
 - When the queue encounters a command whose ID is already in progress, the command will be re-inserted at the end of the queue
 - When scheduling a command with an ID which is already scheduled, the originally scheduled command will be replaced with the newly scheduled command
 
-You could also configure a custom ID generator for this type of command, Then a consistent ID would be generated wherever this command is issued from in your app. The included `Md5IdGenerator` will have this effect, generating an ID based on the MD5 hash of the serialized command:
+You could also configure a custom ID generator for this type of command, Then a consistent ID would be generated automatically wherever this command is issued from in your app. The included `Md5IdGenerator` will have this effect, generating an ID based on the MD5 hash of the serialized command:
 
 ```php
 <?php
