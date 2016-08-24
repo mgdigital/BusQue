@@ -16,6 +16,7 @@ services:
 
 before_install:
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "127.0.0.1 busque-redis busque-php" >> /etc/hosts
   - composer selfupdate
 
 install:
