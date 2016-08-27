@@ -55,6 +55,12 @@ final class BusQueSpec extends AbstractSpec
         $this->scheduleCommand('test_command', $dateTime, 'test_id');
     }
 
+    public function it_can_check_if_an_id_is_queued()
+    {
+        $this->queueDriver->isIdQueued('test', 'test')->willReturn(true);
+        $this->isIDQueued('test', 'test')->shouldReturn(true);
+    }
+
     public function it_can_get_the_length_of_a_queue()
     {
         $this->queueDriver->getQueuedCount('test_queue')->willReturn(10);
@@ -89,7 +95,13 @@ final class BusQueSpec extends AbstractSpec
         $this->listQueuedIds('test_queue', 0, 10)->shouldReturn(['test_command_id']);
         $this->listQueuedIds('test_queue');
     }
-    
+
+    public function it_can_check_if_a_command_is_in_progress()
+    {
+        $this->queueDriver->isIdConsuming('test', 'test')->willReturn(true);
+        $this->isIdInProgress('test', 'test')->shouldReturn(true);
+    }
+
     public function it_can_list_the_command_ids_in_progress()
     {
         $this->queueDriver->getConsumingIds('test_queue')->willReturn(['test_command_id']);
