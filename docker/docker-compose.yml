@@ -13,6 +13,8 @@ services:
             - redis
         networks:
             - front
+        links:
+            - redis
     redis:
         container_name: busque-redis
         image: mgdigital/busque-redis:latest

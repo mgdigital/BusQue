@@ -258,7 +258,7 @@ By default the Behat suite will test integration with PHPRedis. Integration with
 
     bin/behat --profile predis
 
-These tests will attempt to write to a Redis instance at `redis://busque-redis:6379` by default. You can configure an alternate test client by providing an alternate `FeatureContext` class extending either `BusQue\Features\Context\AbstractPHPRedisContext` or `BusQue\Features\Context\AbstractPredisContext`.
+These tests will attempt to write to a Redis instance at `redis://redis:6379` by default. You can configure an alternate test client by providing an alternate `FeatureContext` class extending either `BusQue\Features\Context\AbstractPHPRedisContext` or `BusQue\Features\Context\AbstractPredisContext`.
 
 
 Docker

@@ -12,7 +12,7 @@ class PredisContext extends AbstractPredisContext
     {
         return new Client([
             'scheme' => 'tcp',
-            'host'   => 'busque-redis',
+            'host'   => 'redis',
             'port'   => 6379,
         ]);
     }
