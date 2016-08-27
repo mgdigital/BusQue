@@ -43,8 +43,7 @@ $client = new Redis();
 $adapter = new BusQue\Redis\PHPRedis\PHPRedisAdapter($client);
 
 // A Predis adepter is included, although Predis can have issues when used in long-running processes.
-// Using the BusQue\Redis\Predis\Client class prevents an exception when the Client::getIterator() method is called.
-// $client = new BusQue\Redis\Predis\Client();
+// $client = new Predis\Client();
 // $adapter = new BusQue\Redis\Predis\PredisAdapter($client);
 
 $driver = new BusQue\Redis\RedisDriver($adapter);
