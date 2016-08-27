@@ -29,16 +29,16 @@ class RedisDriverSpec extends ObjectBehavior
 
     public function it_can_queue_a_command()
     {
-        $path = $this->getScriptPath('queue_message');
-        $this->adapter->evalScript($path, ['test', 'test', 'test', 'test'])->shouldBeCalled();
+        $lua = $this->getLua('queue_message');
+        $this->adapter->evalLua($lua, ['test', 'test', 'test', 'test'])->shouldBeCalled();
         $this->queueCommand('test', 'test', 'test');
     }
 
     public function it_can_await_a_queued_command()
     {
         $this->adapter->bRPopLPush('test:test:queue', 'test:test:receiving', 0)->shouldBeCalled()->willReturn('test');
-        $path = $this->getScriptPath('receive_message');
-        $this->adapter->evalScript($path, ['test', 'test', 'test'])->shouldBeCalled()->willReturn('test');
+        $lua = $this->getLua('receive_message');
+        $this->adapter->evalLua($lua, ['test', 'test', 'test'])->shouldBeCalled()->willReturn('test');
         /* @var \MGDigital\BusQue\ReceivedCommand $receivedCommand */
         $receivedCommand = $this->awaitCommand('test', 0);
         $receivedCommand->getId()->shouldReturn('test');
@@ -102,15 +102,15 @@ class RedisDriverSpec extends ObjectBehavior
 
     public function it_can_delete_a_queue()
     {
-        $path = $this->getScriptPath('empty_queue');
-        $this->adapter->evalScript($path, ['test', 'test'])->shouldBeCalled();
+        $lua = $this->getLua('empty_queue');
+        $this->adapter->evalLua($lua, ['test', 'test'])->shouldBeCalled();
         $this->deleteQueue('test');
     }
 
     public function it_can_purge_a_command()
     {
-        $path = $this->getScriptPath('purge_message');
-        $this->adapter->evalScript($path, ['test', 'test', 'test'])->shouldBeCalled();
+        $lua = $this->getLua('purge_message');
+        $this->adapter->evalLua($lua, ['test', 'test', 'test'])->shouldBeCalled();
         $this->purgeCommand('test', 'test');
     }
 
@@ -118,8 +118,8 @@ class RedisDriverSpec extends ObjectBehavior
     {
         $date = new \DateTime();
         $timestamp = $date->getTimestamp();
-        $path = $this->getScriptPath('schedule_message');
-        $this->adapter->evalScript($path, ['test', 'test', 'test', 'test', $timestamp])->shouldBeCalled();
+        $lua = $this->getLua('schedule_message');
+        $this->adapter->evalLua($lua, ['test', 'test', 'test', 'test', $timestamp])->shouldBeCalled();
         $this->scheduleCommand('test', 'test', 'test', $date);
     }
 
@@ -133,8 +133,8 @@ class RedisDriverSpec extends ObjectBehavior
 
     public function it_can_clear_the_schedule()
     {
-        $path = $this->getScriptPath('clear_schedule');
-        $this->adapter->evalScript($path, ['test', 'test', '-inf', '+inf'])->shouldBeCalled();
+        $lua = $this->getLua('clear_schedule');
+        $this->adapter->evalLua($lua, ['test', 'test', '-inf', '+inf'])->shouldBeCalled();
         $this->clearSchedule(['test']);
     }
 
@@ -142,8 +142,8 @@ class RedisDriverSpec extends ObjectBehavior
     {
         $date = new \DateTime();
         $timestamp = $date->getTimestamp();
-        $path = $this->getScriptPath('receive_due_messages');
-        $this->adapter->evalScript($path, ['test', 0, $timestamp, SchedulerWorker::DEFAULT_THROTTLE])
+        $lua = $this->getLua('receive_due_messages');
+        $this->adapter->evalLua($lua, ['test', 0, $timestamp, SchedulerWorker::DEFAULT_THROTTLE])
             ->shouldBeCalled()
             ->willReturn([['test', 'test', 'test', $timestamp]]);
         $commandsWrapper = $this->receiveDueCommands($date);
@@ -155,13 +155,13 @@ class RedisDriverSpec extends ObjectBehavior
 
     public function it_can_purge_the_namespace()
     {
-        $path = $this->getScriptPath('purge_namespace');
-        $this->adapter->evalScript($path, ['test'])->shouldBeCalled();
+        $lua = $this->getLua('purge_namespace');
+        $this->adapter->evalLua($lua, ['test'])->shouldBeCalled();
         $this->purgeNamespace();
     }
 
-    private function getScriptPath(string $script): string
+    private function getLua(string $script): string
     {
-        return RedisDriver::LUA_PATH . '/' . $script . '.lua';
+        return file_get_contents(RedisDriver::LUA_PATH . '/' . $script . '.lua');
     }
 }

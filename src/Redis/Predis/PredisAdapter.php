@@ -5,7 +5,7 @@ namespace MGDigital\BusQue\Redis\Predis;
 use MGDigital\BusQue\Exception\RedisException;
 use MGDigital\BusQue\Redis\RedisAdapterInterface;
 use Predis\ClientInterface;
-use Predis\Connection\ConnectionException as PredisConnectionException;
+use Predis\Connection\ConnectionException;
 
 class PredisAdapter implements RedisAdapterInterface
 {
@@ -19,108 +19,88 @@ class PredisAdapter implements RedisAdapterInterface
 
     public function ping()
     {
-        try {
+        $this->tryCatch(function () {
             $this->client->ping();
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function bRPopLPush(string $source, string $destination, int $timeout)
     {
-        try {
+        return $this->tryCatch(function () use ($source, $destination, $timeout) {
             return $this->client->brpoplpush($source, $destination, $timeout);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function hGet(string $key, string $field)
     {
-        try {
+        return $this->tryCatch(function () use ($key, $field) {
             return $this->client->hget($key, $field);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function sAdd(string $key, array $members)
     {
-        try {
+        $this->tryCatch(function () use ($key, $members) {
             $this->client->sadd($key, $members);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function sRem(string $key, array $members)
     {
-        try {
+        $this->tryCatch(function () use ($key, $members) {
             $this->client->srem($key, $members);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function sIsMember(string $key, string $value): bool
     {
-        try {
+        return $this->tryCatch(function () use ($key, $value) {
             return $this->client->sismember($key, $value);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function sMembers(string $key): array
     {
-        try {
+        return $this->tryCatch(function () use ($key) {
             return $this->client->smembers($key);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function lLen(string $key): int
     {
-        try {
+        return $this->tryCatch(function () use ($key) {
             return $this->client->llen($key);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function lRange(string $key, int $offset = 0, int $limit = 10): array
     {
-        try {
+        return $this->tryCatch(function () use ($key, $offset, $limit) {
             return $this->client->lrange($key, $offset, $limit);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function zScore(string $key, string $value)
     {
-        try {
-            $score = $this->client->zscore($key, $value);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        $score = $this->tryCatch(function () use ($key, $value) {
+            return $this->client->zscore($key, $value);
+        });
         return $score === null ? $score : intval($score);
     }
 
-    public function del(string $key)
+    public function evalLua(string $lua, array $args)
     {
-        try {
-            $this->client->del($key);
-        } catch (PredisConnectionException $e) {
-            throw new RedisException();
-        }
+        return $this->tryCatch(function () use ($lua, $args) {
+            return $this->client->eval($lua, 0, ...$args);
+        });
     }
 
-    public function evalScript(string $path, array $args)
+    private function tryCatch(callable $callable)
     {
-        $command = new LuaFileCommand($path);
-        $command->setArguments($args);
-        return $this->client->executeCommand($command);
+        try {
+            return $callable();
+        } catch (ConnectionException $e) {
+            throw new RedisException($e->getMessage(), 0, $e);
+        }
     }
 }

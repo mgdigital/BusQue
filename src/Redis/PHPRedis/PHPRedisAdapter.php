@@ -17,111 +17,88 @@ class PHPRedisAdapter implements RedisAdapterInterface
 
     public function ping()
     {
-        try {
+        $this->tryCatch(function () {
             $this->redis->ping();
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function bRPopLPush(string $source, string $destination, int $timeout)
     {
-        try {
+        return $this->tryCatch(function () use ($source, $destination, $timeout) {
             return $this->redis->brpoplpush($source, $destination, $timeout);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function hGet(string $key, string $field)
     {
-        try {
+        return $this->tryCatch(function () use ($key, $field) {
             return $this->redis->hGet($key, $field);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function sAdd(string $key, array $members)
     {
-        try {
+        $this->tryCatch(function () use ($key, $members) {
             $this->redis->sAdd($key, ...$members);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function sRem(string $key, array $members)
     {
-        try {
+        $this->tryCatch(function () use ($key, $members) {
             $this->redis->sRem($key, ...$members);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function sIsMember(string $key, string $value): bool
     {
-        try {
+        return $this->tryCatch(function () use ($key, $value) {
             return $this->redis->sIsMember($key, $value);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function sMembers(string $key): array
     {
-        try {
+        return $this->tryCatch(function () use ($key) {
             return $this->redis->sMembers($key);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function lLen(string $key): int
     {
-        try {
+        return $this->tryCatch(function () use ($key) {
             return $this->redis->lLen($key);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function lRange(string $key, int $offset = 0, int $limit = 10): array
     {
-        try {
+        return $this->tryCatch(function () use ($key, $offset, $limit) {
             return $this->redis->lRange($key, $offset, $limit);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        });
     }
 
     public function zScore(string $key, string $value)
     {
-        try {
-            $score = $this->redis->zScore($key, $value);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        $score = $this->tryCatch(function () use ($key, $value) {
+            return $this->redis->zScore($key, $value);
+        });
         return $score === null ? $score : intval($score);
     }
 
-    public function del(string $key)
+    public function evalLua(string $lua, array $args)
     {
-        try {
-            $this->redis->del($key);
-        } catch (\RedisException $e) {
-            throw new RedisException();
-        }
+        return $this->tryCatch(function () use ($lua, $args) {
+            return $this->redis->evaluate($lua, $args, 0);
+        });
     }
 
-    public function evalScript(string $path, array $args)
+    private function tryCatch(callable $callable)
     {
-        $lua = file_get_contents($path);
         try {
-            return $this->redis->eval($lua, $args);
+            return $callable();
         } catch (\RedisException $e) {
-            throw new RedisException();
+            throw new RedisException($e->getMessage(), 0, $e);
         }
     }
 }

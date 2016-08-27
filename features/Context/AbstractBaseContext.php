@@ -105,7 +105,7 @@ abstract class AbstractBaseContext implements SnippetAcceptingContext
     public function thereShouldBeNCommandsInTheQueue(int $arg1)
     {
         $count = $this->implementation->getQueueDriver()->getQueuedCount('test_queue');
-        \PHPUnit_Framework_Assert::assertEquals($count, $arg1);
+        \PHPUnit_Framework_Assert::assertEquals($arg1, $count);
     }
 
     /**

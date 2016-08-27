@@ -197,11 +197,8 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
 
     private function evalScript(string $script, array $args)
     {
-        return $this->adapter->evalScript($this->getScriptPath($script), $args);
-    }
-
-    private function getScriptPath(string $script): string
-    {
-        return self::LUA_PATH . '/' . $script . '.lua';
+        $path = self::LUA_PATH . '/' . $script . '.lua';
+        $lua = file_get_contents($path);
+        return $this->adapter->evalLua($lua, $args);
     }
 }

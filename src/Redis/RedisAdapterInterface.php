@@ -35,7 +35,5 @@ interface RedisAdapterInterface
      */
     public function zScore(string $key, string $value);
 
-    public function del(string $key);
-
-    public function evalScript(string $path, array $args);
+    public function evalLua(string $lua, array $args);
 }
