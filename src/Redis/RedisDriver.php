@@ -35,20 +35,19 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
 
     public function awaitCommand(string $queueName, int $time = null): ReceivedCommand
     {
-        $this->adapter->ping();
         $id = $this->adapter->bRPopLPush(
             "{$this->namespace}:{$queueName}:queue",
             "{$this->namespace}:{$queueName}:receiving",
             $time ?? 0
         );
-        if (!empty($id)) {
-            $serialized = $this->evalScript('receive_message', [$this->namespace, $queueName, $id]);
-            if (empty($serialized)) {
-                throw new DriverException(sprintf('Error deserializing command %s.', $id));
-            }
-            return new ReceivedCommand($queueName, $id, $serialized);
+        if (empty($id)) {
+            throw new TimeoutException;
         }
-        throw new TimeoutException;
+        $serialized = $this->evalScript('receive_message', [$this->namespace, $queueName, $id]);
+        if (empty($serialized)) {
+            throw new DriverException(sprintf('Error retrieving command %s.', $id));
+        }
+        return new ReceivedCommand($queueName, $id, $serialized);
     }
 
     public function completeCommand(string $queueName, string $id)

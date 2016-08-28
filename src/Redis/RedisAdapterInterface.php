@@ -5,8 +5,6 @@ namespace MGDigital\BusQue\Redis;
 interface RedisAdapterInterface
 {
 
-    public function ping();
-
     public function bRPopLPush(string $source, string $destination, int $timeout);
 
     /**

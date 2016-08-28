@@ -17,7 +17,6 @@ class RedisDriverSpec extends ObjectBehavior
 
     public function let(RedisAdapterInterface $adapter)
     {
-        $adapter->ping()->willReturn(null);
         $this->beConstructedWith($adapter, 'test');
         $this->adapter = $adapter;
     }

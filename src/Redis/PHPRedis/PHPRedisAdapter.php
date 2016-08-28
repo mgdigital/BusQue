@@ -15,13 +15,6 @@ class PHPRedisAdapter implements RedisAdapterInterface
         $this->redis = $redis;
     }
 
-    public function ping()
-    {
-        $this->tryCatch(function () {
-            $this->redis->ping();
-        });
-    }
-
     public function bRPopLPush(string $source, string $destination, int $timeout)
     {
         return $this->tryCatch(function () use ($source, $destination, $timeout) {

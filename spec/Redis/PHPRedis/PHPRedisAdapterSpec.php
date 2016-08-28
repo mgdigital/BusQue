@@ -25,14 +25,6 @@ class PHPRedisAdapterSpec extends ObjectBehavior
         $this->shouldHaveType(PHPRedisAdapter::class);
     }
 
-    public function it_can_ping()
-    {
-        $this->redis->ping()->shouldBeCalled()->willReturn(null);
-        $this->ping();
-        $this->redis->ping()->willThrow(new \RedisException());
-        $this->shouldThrow(DriverException::class)->during('ping');
-    }
-
     public function it_can_brpoplpush()
     {
         $this->redis->brpoplpush('test', 'test', 0)->shouldBeCalled()->willReturn('test');

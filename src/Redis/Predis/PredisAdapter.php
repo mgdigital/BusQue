@@ -17,13 +17,6 @@ class PredisAdapter implements RedisAdapterInterface
         $this->client = $client;
     }
 
-    public function ping()
-    {
-        $this->tryCatch(function () {
-            $this->client->ping();
-        });
-    }
-
     public function bRPopLPush(string $source, string $destination, int $timeout)
     {
         return $this->tryCatch(function () use ($source, $destination, $timeout) {

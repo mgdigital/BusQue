@@ -32,14 +32,6 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->shouldHaveType(PredisAdapter::class);
     }
 
-    public function it_can_ping()
-    {
-        $this->client->ping()->shouldBeCalled()->willReturn(null);
-        $this->ping();
-        $this->client->ping()->willThrow($this->predisException);
-        $this->shouldThrow(DriverException::class)->during('ping');
-    }
-
     public function it_can_brpoplpush()
     {
         $this->client->brpoplpush('test', 'test', 0)->shouldBeCalled()->willReturn('test');
