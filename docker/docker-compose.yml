@@ -7,21 +7,10 @@ services:
         volumes:
             - ../:/busque/
         working_dir: /busque
-        ports:
-            - "9000:9000"
         depends_on:
             - redis
-        networks:
-            - front
         links:
             - redis
     redis:
         container_name: busque-redis
-        image: mgdigital/busque-redis:latest
-        build: ./redis
-        ports:
-            - "6379:6379"
-        networks:
-            - front
-networks:
-    front:
+        image: redis:3.2-alpine
