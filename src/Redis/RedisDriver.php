@@ -22,7 +22,7 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
     public function __construct(RedisAdapterInterface $adapter, string $namespace = '')
     {
         $this->adapter = $adapter;
-        if (!preg_match('/^[a-z0-9_\-]*$/i', $namespace)) {
+        if (!preg_match('/^[a-z0-9_\-\.]*$/i', $namespace)) {
             throw new \InvalidArgumentException('Invalid namespace.');
         }
         $this->namespace = $namespace;
