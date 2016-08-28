@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue\Redis\PHPRedis;
 
-use MGDigital\BusQue\Exception\RedisException;
+use MGDigital\BusQue\Exception\DriverException;
 use MGDigital\BusQue\Redis\RedisAdapterInterface;
 
 class PHPRedisAdapter implements RedisAdapterInterface
@@ -98,7 +98,7 @@ class PHPRedisAdapter implements RedisAdapterInterface
         try {
             return $callable();
         } catch (\RedisException $e) {
-            throw new RedisException($e->getMessage(), 0, $e);
+            throw new DriverException($e->getMessage(), 0, $e);
         }
     }
 }

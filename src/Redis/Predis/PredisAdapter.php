@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue\Redis\Predis;
 
-use MGDigital\BusQue\Exception\RedisException;
+use MGDigital\BusQue\Exception\DriverException;
 use MGDigital\BusQue\Redis\RedisAdapterInterface;
 use Predis\ClientInterface;
 use Predis\Connection\ConnectionException;
@@ -100,7 +100,7 @@ class PredisAdapter implements RedisAdapterInterface
         try {
             return $callable();
         } catch (ConnectionException $e) {
-            throw new RedisException($e->getMessage(), 0, $e);
+            throw new DriverException($e->getMessage(), 0, $e);
         }
     }
 }

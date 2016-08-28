@@ -2,7 +2,7 @@
 
 namespace spec\MGDigital\BusQue\Redis\Predis;
 
-use MGDigital\BusQue\Exception\RedisException;
+use MGDigital\BusQue\Exception\DriverException;
 use MGDigital\BusQue\Redis\Predis\PredisAdapter;
 use PhpSpec\ObjectBehavior;
 use Predis\Connection\ConnectionException as PredisException;
@@ -37,7 +37,7 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->client->ping()->shouldBeCalled()->willReturn(null);
         $this->ping();
         $this->client->ping()->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('ping');
+        $this->shouldThrow(DriverException::class)->during('ping');
     }
 
     public function it_can_brpoplpush()
@@ -46,7 +46,7 @@ class PredisAdapterSpec extends ObjectBehavior
         $result = $this->bRPopLPush('test', 'test', 0);
         \PHPUnit_Framework_Assert::assertEquals('test', $result->getWrappedObject());
         $this->client->brpoplpush('test', 'test', 0)->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('bRPopLPush', ['test', 'test', 0]);
+        $this->shouldThrow(DriverException::class)->during('bRPopLPush', ['test', 'test', 0]);
     }
 
     public function it_can_hget()
@@ -54,7 +54,7 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->client->hget('test', 'test')->shouldBeCalled()->willReturn('test');
         $this->hGet('test', 'test')->shouldReturn('test');
         $this->client->hget('test', 'test')->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('hGet', ['test', 'test']);
+        $this->shouldThrow(DriverException::class)->during('hGet', ['test', 'test']);
     }
 
     public function it_can_sadd()
@@ -62,7 +62,7 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->client->sadd('test', ['test'])->shouldBeCalled();
         $this->sAdd('test', ['test']);
         $this->client->sadd('test', ['test'])->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('sAdd', ['test', ['test']]);
+        $this->shouldThrow(DriverException::class)->during('sAdd', ['test', ['test']]);
     }
 
     public function it_can_srem()
@@ -70,7 +70,7 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->client->srem('test', ['test'])->shouldBeCalled();
         $this->sRem('test', ['test']);
         $this->client->srem('test', ['test'])->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('sRem', ['test', ['test']]);
+        $this->shouldThrow(DriverException::class)->during('sRem', ['test', ['test']]);
     }
 
     public function it_can_sismember()
@@ -78,7 +78,7 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->client->sismember('test', 'test')->shouldBeCalled()->willReturn(true);
         $this->sIsMember('test', 'test')->shouldReturn(true);
         $this->client->sismember('test', 'test')->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('sIsMember', ['test', 'test']);
+        $this->shouldThrow(DriverException::class)->during('sIsMember', ['test', 'test']);
     }
 
     public function it_can_smembers()
@@ -86,7 +86,7 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->client->smembers('test')->shouldBeCalled()->willReturn(['test']);
         $this->sMembers('test')->shouldReturn(['test']);
         $this->client->smembers('test')->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('sMembers', ['test']);
+        $this->shouldThrow(DriverException::class)->during('sMembers', ['test']);
     }
 
     public function it_can_llen()
@@ -94,7 +94,7 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->client->llen('test')->shouldBeCalled()->willReturn(1);
         $this->lLen('test')->shouldReturn(1);
         $this->client->llen('test')->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('lLen', ['test']);
+        $this->shouldThrow(DriverException::class)->during('lLen', ['test']);
     }
 
     public function it_can_lrange()
@@ -102,7 +102,7 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->client->lrange('test', 0, 10)->shouldBeCalled()->willReturn(['test']);
         $this->lRange('test', 0, 10)->shouldReturn(['test']);
         $this->client->lrange('test', 0, 10)->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('lRange', ['test', 0, 10]);
+        $this->shouldThrow(DriverException::class)->during('lRange', ['test', 0, 10]);
     }
 
     public function it_can_zscore()
@@ -110,6 +110,6 @@ class PredisAdapterSpec extends ObjectBehavior
         $this->client->zscore('test', 'test')->shouldBeCalled()->willReturn(1);
         $this->zScore('test', 'test')->shouldReturn(1);
         $this->client->zscore('test', 'test')->willThrow($this->predisException);
-        $this->shouldThrow(RedisException::class)->during('zScore', ['test', 'test']);
+        $this->shouldThrow(DriverException::class)->during('zScore', ['test', 'test']);
     }
 }

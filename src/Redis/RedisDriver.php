@@ -3,7 +3,7 @@
 namespace MGDigital\BusQue\Redis;
 
 use MGDigital\BusQue\Exception\CommandNotFoundException;
-use MGDigital\BusQue\Exception\RedisException;
+use MGDigital\BusQue\Exception\DriverException;
 use MGDigital\BusQue\Exception\TimeoutException;
 use MGDigital\BusQue\QueueDriverInterface;
 use MGDigital\BusQue\ReceivedCommand;
@@ -33,32 +33,22 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
         $this->evalScript('queue_message', [$this->namespace, $queueName, $commandId, $serialized]);
     }
 
-    public function awaitCommand(string $queueName, int $timeout = null): ReceivedCommand
+    public function awaitCommand(string $queueName, int $time = null): ReceivedCommand
     {
-        $stopwatchStart = time();
         $this->adapter->ping();
-        try {
-            $id = $this->adapter->bRPopLPush(
-                "{$this->namespace}:{$queueName}:queue",
-                "{$this->namespace}:{$queueName}:receiving",
-                $timeout ?? 0
-            );
-        } catch (RedisException $e) {
-            $id = null;
-        }
+        $id = $this->adapter->bRPopLPush(
+            "{$this->namespace}:{$queueName}:queue",
+            "{$this->namespace}:{$queueName}:receiving",
+            $time ?? 0
+        );
         if (!empty($id)) {
             $serialized = $this->evalScript('receive_message', [$this->namespace, $queueName, $id]);
-            if (!empty($serialized)) {
-                return new ReceivedCommand($queueName, $id, $serialized);
+            if (empty($serialized)) {
+                throw new DriverException(sprintf('Error deserializing command %s.', $id));
             }
+            return new ReceivedCommand($queueName, $id, $serialized);
         }
-        if ($timeout !== null) {
-            $timeout = time() - $stopwatchStart - $timeout;
-            if ($timeout <= 0) {
-                throw new TimeoutException;
-            }
-        }
-        return $this->awaitCommand($queueName, $timeout);
+        throw new TimeoutException;
     }
 
     public function completeCommand(string $queueName, string $id)

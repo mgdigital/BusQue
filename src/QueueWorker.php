@@ -2,8 +2,8 @@
 
 namespace MGDigital\BusQue;
 
+use MGDigital\BusQue\Exception\DriverException;
 use MGDigital\BusQue\Exception\TimeoutException;
-use Psr\Log\LogLevel;
 
 class QueueWorker
 {
@@ -19,8 +19,15 @@ class QueueWorker
     {
         $stopwatchStart = time();
         while ($n === null || $n > 0) {
-            $this->iterate($queueName, $time);
-            $n === null || $n--;
+            try {
+                $this->iterate($queueName, $time);
+                $n === null || $n--;
+            } catch (DriverException $exception) {
+                $this->implementation->getLogger()
+                    ->error($exception->getMessage(), compact('exception'));
+            } catch (TimeoutException $e) {
+                break;
+            }
             if ($time !== null && (time() - $stopwatchStart >= $time)) {
                 break;
             }
@@ -29,21 +36,20 @@ class QueueWorker
 
     private function iterate(string $queueName, int $time = null)
     {
-        try {
-            $received = $this->implementation->getQueueDriver()
-                ->awaitCommand($queueName, $time);
-        } catch (TimeoutException $e) {
-            return;
-        }
+        $received = $this->implementation->getQueueDriver()
+            ->awaitCommand($queueName, $time);
         $command = $this->implementation->getCommandSerializer()
             ->unserialize($received->getSerialized());
-        $this->implementation->getLogger()->debug('Command received', compact('command'));
+        $this->implementation->getLogger()
+            ->debug('Command received', compact('command'));
         try {
             $this->implementation->getCommandBusAdapter()
                 ->handle($command, true);
-            $this->implementation->getLogger()->info('Command handled', compact('command'));
+            $this->implementation->getLogger()
+                ->info('Command handled', compact('command'));
         } catch (\Throwable $exception) {
-            $this->implementation->getLogger()->error('Command failed', compact('command', 'exception'));
+            $this->implementation->getLogger()
+                ->error('Command failed', compact('command', 'exception'));
         } finally {
             $this->implementation->getQueueDriver()
                 ->completeCommand($received->getQueueName(), $received->getId());

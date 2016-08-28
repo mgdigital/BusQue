@@ -8,7 +8,7 @@ class PHPRedisContext extends AbstractPHPRedisContext
     protected function getRedis(): \Redis
     {
         $redis = new \Redis();
-        $redis->connect('redis');
+        $redis->pconnect('redis');
         return $redis;
     }
 }

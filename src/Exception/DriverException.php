@@ -2,7 +2,7 @@
 
 namespace MGDigital\BusQue\Exception;
 
-class RedisException extends BusQueException
+class DriverException extends BusQueException
 {
 
 }

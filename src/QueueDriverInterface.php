@@ -43,5 +43,5 @@ interface QueueDriverInterface
      * @return ReceivedCommand
      * @throws TimeoutException
      */
-    public function awaitCommand(string $queueName, int $timeout = null): ReceivedCommand;
+    public function awaitCommand(string $queueName, int $time = null): ReceivedCommand;
 }
