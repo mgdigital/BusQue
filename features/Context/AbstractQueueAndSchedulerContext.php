@@ -11,6 +11,7 @@ use MGDigital\BusQue\SchedulerDriverInterface;
 use MGDigital\BusQue\Serializer\PHPCommandSerializer;
 use MGDigital\BusQue\SystemClock;
 use MGDigital\BusQue\Tactician\CommandBusAdapter;
+use Psr\Log\NullLogger;
 
 abstract class AbstractQueueAndSchedulerContext extends AbstractBaseContext
 {
@@ -26,12 +27,12 @@ abstract class AbstractQueueAndSchedulerContext extends AbstractBaseContext
             $this->getQueueAdapter(),
             $this->getSchedulerAdapter(),
             new SystemClock(),
-            new CommandBusAdapter(new CommandBus([]))
+            new CommandBusAdapter(new CommandBus([])),
+            new NullLogger()
         );
     }
 
     abstract protected function getQueueAdapter(): QueueDriverInterface;
 
     abstract protected function getSchedulerAdapter(): SchedulerDriverInterface;
-
 }

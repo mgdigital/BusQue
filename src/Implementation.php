@@ -2,6 +2,8 @@
 
 namespace MGDigital\BusQue;
 
+use Psr\Log\LoggerInterface;
+
 final class Implementation
 {
 
@@ -12,6 +14,7 @@ final class Implementation
     private $schedulerDriver;
     private $clock;
     private $commandBusAdapter;
+    private $logger;
 
     public function __construct(
         QueueResolverInterface $queueResolver,
@@ -20,7 +23,8 @@ final class Implementation
         QueueDriverInterface $queueDriver,
         SchedulerDriverInterface $schedulerDriver,
         ClockInterface $clock,
-        CommandBusAdapterInterface $commandBusAdapter
+        CommandBusAdapterInterface $commandBusAdapter,
+        LoggerInterface $logger
     ) {
         $this->queueResolver = $queueResolver;
         $this->commandSerializer = $commandSerializer;
@@ -29,6 +33,7 @@ final class Implementation
         $this->schedulerDriver = $schedulerDriver;
         $this->clock = $clock;
         $this->commandBusAdapter = $commandBusAdapter;
+        $this->logger = $logger;
     }
 
     public function getQueueResolver(): QueueResolverInterface
@@ -64,5 +69,10 @@ final class Implementation
     public function getCommandBusAdapter(): CommandBusAdapterInterface
     {
         return $this->commandBusAdapter;
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }

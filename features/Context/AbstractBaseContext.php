@@ -6,12 +6,10 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use MGDigital\BusQue\ClockInterface;
 use MGDigital\BusQue\CommandBusAdapterInterface;
 use MGDigital\BusQue\CommandIdGeneratorInterface;
-use MGDigital\BusQue\ErrorHandlerInterface;
 use MGDigital\BusQue\Exception\TimeoutException;
 use MGDigital\BusQue\Handler\QueuedCommandHandler;
 use MGDigital\BusQue\Handler\ScheduledCommandHandler;
 use MGDigital\BusQue\Implementation;
-use MGDigital\BusQue\Logging\LoggingErrorHandler;
 use MGDigital\BusQue\QueuedCommand;
 use MGDigital\BusQue\QueueResolverInterface;
 use MGDigital\BusQue\QueueWorker;
@@ -50,11 +48,6 @@ abstract class AbstractBaseContext implements SnippetAcceptingContext
     protected $queueResolver;
 
     /**
-     * @var ErrorHandlerInterface
-     */
-    protected $errorHandler;
-
-    /**
      * @var ClockInterface
      */
     protected $clock;
@@ -72,8 +65,6 @@ abstract class AbstractBaseContext implements SnippetAcceptingContext
         $this->commandIdGenerator->generateId(Argument::any())->willReturn('test_command_id');
         $this->queueResolver = $this->prophet->prophesize(QueueResolverInterface::class);
         $this->queueResolver->resolveQueueName(Argument::any())->willReturn('test_queue');
-        $this->errorHandler = $this->prophet->prophesize(ErrorHandlerInterface::class);
-        $this->errorHandler->handleCommandError(Argument::any(), Argument::type(\Throwable::class))->willReturn(null);
         $this->clock = $this->prophet->prophesize(ClockInterface::class);
         $implementation = $this->getImplementation();
         $this->implementation = new Implementation(
@@ -84,7 +75,7 @@ abstract class AbstractBaseContext implements SnippetAcceptingContext
             $implementation->getSchedulerDriver(),
             $this->clock->reveal(),
             $this->commandBus->reveal(),
-            $this->errorHandler->reveal()
+            new NullLogger()
         );
         $this->implementation->getQueueDriver()->deleteQueue('test_queue');
         $this->implementation->getSchedulerDriver()->clearSchedule();

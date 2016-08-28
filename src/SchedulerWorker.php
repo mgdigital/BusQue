@@ -56,15 +56,21 @@ class SchedulerWorker
         }
         $receivedCommands = $this->implementation->getSchedulerDriver()
             ->receiveDueCommands($now, $throttle, $start);
-        foreach ($receivedCommands as $received) {
-            $this->implementation->getQueueDriver()
-                ->queueCommand(
-                    $received->getQueueName(),
-                    $received->getId(),
-                    $received->getSerialized()
-                );
+        foreach ($receivedCommands as $command) {
+            $this->handleReceivedCommand($command);
             $count++;
         }
         return $count;
+    }
+
+    private function handleReceivedCommand(ReceivedScheduledCommand $command)
+    {
+        $this->implementation->getQueueDriver()
+            ->queueCommand(
+                $command->getQueueName(),
+                $command->getId(),
+                $command->getSerialized()
+            );
+        $this->implementation->getLogger()->debug('Scheduled command queued', compact('command'));
     }
 }
