@@ -3,7 +3,7 @@ services:
     php:
         container_name: busque-php
         image: mgdigital/busque-php:latest
-        build: ./php
+        build: .
         volumes:
             - ../:/busque/
         working_dir: /busque
