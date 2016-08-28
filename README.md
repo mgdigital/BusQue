@@ -103,7 +103,7 @@ $busQue->queueCommand($command);
 $busQue->workQueue('default'); // Hello Joe!
 ```
 
-Or in your Symfony app run `app/console busque:queue_worker SendEmailCommand`
+Or in your Symfony app run `app/console busque:queue_worker default`
 
 You need to run at least one worker instance for each of your queues, using something like [supervisord](http://supervisord.org/).
 
