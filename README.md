@@ -73,25 +73,24 @@ $implementation = new BusQue\Implementation(
 $busQue = new BusQue\BusQue($implementation);
 ```
 
-The `BusQue\Handler\QueuedCommandHandler` and `BusQue\Handler\ScheduledCommandHandler` classes also needs to be registered with your command bus (Tactician). See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.
-
-If you're using the Symfony bundle, then all of the above is done for you, and you can just get the `busque` service from the container.
+*If you're using the Symfony bundle, then you can just get the `busque` service from the container.*
 
 
 ### Queuing a command
 
-`SendEmailCommand` is a command which you've configured Tactician to handle:
+`SendEmailCommand` is a command which you've configured Tactician to handle (See [the Tactician website](https://tactician.thephpleague.com/) for further information on using a command bus.):
 
 ```php
 <?php
 
 $command = new SendEmailCommand('joe@example.com', 'Hello Joe!');
 
-$commandBus->handle(new BusQue\QueuedCommand($command));
+$busQue->queueCommand($command);
 
 // or
 
-$busQue->queueCommand($command);
+$commandBus->handle(new BusQue\QueuedCommand($command));
+// For this second example to work, you need to register the BusQue\Handler\QueuedCommandHandler class with your command bus. 
 ```
 
 
@@ -115,11 +114,12 @@ You need to run at least one worker instance for each of your queues, using some
 ```php
 <?php
 
-$commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
+$busQue->scheduleCommand($command, new \DateTime('+1 minute'));
 
 // or
 
-$busQue->scheduleCommand($command, new \DateTime('+1 minute'));
+$commandBus->handle(new BusQue\ScheduledCommand($command, new \DateTime('+1 minute')));
+// For this second example to work, you need to register the BusQue\Handler\ScheduledCommandHandler class with your command bus.
 ```
 
 
