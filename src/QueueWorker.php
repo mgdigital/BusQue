@@ -2,6 +2,7 @@
 
 namespace MGDigital\BusQue;
 
+use MGDigital\BusQue\Exception\ConcurrencyException;
 use MGDigital\BusQue\Exception\DriverException;
 use MGDigital\BusQue\Exception\TimeoutException;
 
@@ -25,7 +26,9 @@ class QueueWorker
             } catch (DriverException $exception) {
                 $this->implementation->getLogger()
                     ->error($exception->getMessage(), compact('exception'));
-            } catch (TimeoutException $e) {
+            } catch (ConcurrencyException $exception) {
+                // do nothing
+            } catch (TimeoutException $exception) {
                 break;
             }
             if ($time !== null && (time() - $stopwatchStart >= $time)) {

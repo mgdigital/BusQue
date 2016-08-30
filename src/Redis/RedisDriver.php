@@ -3,6 +3,7 @@
 namespace MGDigital\BusQue\Redis;
 
 use MGDigital\BusQue\Exception\CommandNotFoundException;
+use MGDigital\BusQue\Exception\ConcurrencyException;
 use MGDigital\BusQue\Exception\DriverException;
 use MGDigital\BusQue\Exception\TimeoutException;
 use MGDigital\BusQue\QueueDriverInterface;
@@ -45,7 +46,7 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
         }
         $serialized = $this->evalScript('receive_message', [$this->namespace, $queueName, $id]);
         if (empty($serialized)) {
-            throw new DriverException(sprintf('Error retrieving command %s.', $id));
+            throw new ConcurrencyException(sprintf('Cannot currently receive command %s.', $id));
         }
         return new ReceivedCommand($queueName, $id, $serialized);
     }
