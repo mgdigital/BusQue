@@ -4,60 +4,9 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7e367de1360b18892dbe545f8e8748dc",
-    "content-hash": "c8673168d10dedd0245e6041aa44519a",
+    "hash": "f3fe2fde4920ee237cdcb1bbae524038",
+    "content-hash": "abd407047372535e09a406d014760426",
     "packages": [
-        {
-            "name": "league/tactician",
-            "version": "v1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thephpleague/tactician.git",
-                "reference": "1f3aaad497f07a8bef147a37c7e3f2f7c23fcd21"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/tactician/zipball/1f3aaad497f07a8bef147a37c7e3f2f7c23fcd21",
-                "reference": "1f3aaad497f07a8bef147a37c7e3f2f7c23fcd21",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5"
-            },
-            "require-dev": {
-                "mockery/mockery": "~0.9",
-                "phpunit/phpunit": "~4.3",
-                "squizlabs/php_codesniffer": "~2.3"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "League\\Tactician\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ross Tuck",
-                    "homepage": "http://tactician.thephpleague.com"
-                }
-            ],
-            "description": "A small, flexible command bus. Handy for building service layers.",
-            "keywords": [
-                "command",
-                "command bus",
-                "service layer"
-            ],
-            "time": "2016-02-20 11:14:36"
-        },
         {
             "name": "psr/log",
             "version": "1.0.0",
@@ -372,6 +321,57 @@
             ],
             "description": "Integrates CodeCoverage with PhpSpec",
             "time": "2016-08-02 06:07:43"
+        },
+        {
+            "name": "league/tactician",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/tactician.git",
+                "reference": "1f3aaad497f07a8bef147a37c7e3f2f7c23fcd21"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/tactician/zipball/1f3aaad497f07a8bef147a37c7e3f2f7c23fcd21",
+                "reference": "1f3aaad497f07a8bef147a37c7e3f2f7c23fcd21",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "phpunit/phpunit": "~4.3",
+                "squizlabs/php_codesniffer": "~2.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Tactician\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ross Tuck",
+                    "homepage": "http://tactician.thephpleague.com"
+                }
+            ],
+            "description": "A small, flexible command bus. Handy for building service layers.",
+            "keywords": [
+                "command",
+                "command bus",
+                "service layer"
+            ],
+            "time": "2016-02-20 11:14:36"
         },
         {
             "name": "myclabs/deep-copy",
