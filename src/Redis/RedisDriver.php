@@ -4,7 +4,6 @@ namespace MGDigital\BusQue\Redis;
 
 use MGDigital\BusQue\Exception\CommandNotFoundException;
 use MGDigital\BusQue\Exception\ConcurrencyException;
-use MGDigital\BusQue\Exception\DriverException;
 use MGDigital\BusQue\Exception\TimeoutException;
 use MGDigital\BusQue\QueueDriverInterface;
 use MGDigital\BusQue\ReceivedCommand;
