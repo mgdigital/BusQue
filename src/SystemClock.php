@@ -5,8 +5,8 @@ namespace MGDigital\BusQue;
 class SystemClock implements ClockInterface
 {
 
-    public function getTime(): \DateTime
+    public function getTime(): \DateTimeImmutable
     {
-        return new \DateTime();
+        return new \DateTimeImmutable();
     }
 }

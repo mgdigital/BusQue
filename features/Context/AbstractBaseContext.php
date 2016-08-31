@@ -238,7 +238,7 @@ abstract class AbstractBaseContext implements SnippetAcceptingContext
      */
     public function theTimeIs($arg1, $arg2)
     {
-        $this->clock->getTime()->willReturn(new \DateTime('@' . mktime($arg1, $arg2)));
+        $this->clock->getTime()->willReturn(new \DateTimeImmutable('@' . mktime($arg1, $arg2)));
     }
 
     /**
