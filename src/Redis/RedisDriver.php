@@ -151,9 +151,9 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
     }
 
     public function receiveDueCommands(
-        \DateTime $now,
+        \DateTimeInterface $now,
         int $limit = SchedulerWorker::DEFAULT_THROTTLE,
-        \DateTime $startTime = null
+        \DateTimeInterface $startTime = null
     ): array {
         if ($startTime === null) {
             $start = 0;

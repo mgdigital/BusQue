@@ -51,8 +51,7 @@ class SchedulerWorker
         if ($expiry === null) {
             $start = null;
         } else {
-            $start = clone $now;
-            $start = $start->sub($expiry);
+            $start = $now->sub($expiry);
         }
         $receivedCommands = $this->implementation->getSchedulerDriver()
             ->receiveDueCommands($now, $throttle, $start);

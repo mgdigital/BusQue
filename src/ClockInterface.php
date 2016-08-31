@@ -5,5 +5,5 @@ namespace MGDigital\BusQue;
 interface ClockInterface
 {
 
-    public function getTime(): \DateTime;
+    public function getTime(): \DateTimeImmutable;
 }

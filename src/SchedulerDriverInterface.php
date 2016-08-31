@@ -19,14 +19,14 @@ interface SchedulerDriverInterface
     public function getScheduledTime(string $queueName, string $id);
 
     /**
-     * @param \DateTime $now
+     * @param \DateTimeInterface $now
      * @param int $limit The maximum number of scheduled commands to return.
-     * @param \DateTime|null $startTime Return due commands since $startTime or the beginning of time.
+     * @param \DateTimeInterface|null $startTime Return due commands since $startTime or the beginning of time.
      * @return ReceivedScheduledCommand[]
      */
     public function receiveDueCommands(
-        \DateTime $now,
+        \DateTimeInterface $now,
         int $limit = SchedulerWorker::DEFAULT_THROTTLE,
-        \DateTime $startTime = null
+        \DateTimeInterface $startTime = null
     ): array;
 }
