@@ -37,7 +37,7 @@ class BusQue
         $this->implementation->getCommandBusAdapter()->handle(new QueuedCommand($command, $commandId));
     }
 
-    public function scheduleCommand($command, \DateTime $dateTime, string $commandId = null)
+    public function scheduleCommand($command, \DateTimeInterface $dateTime, string $commandId = null)
     {
         $this->implementation->getCommandBusAdapter()->handle(new ScheduledCommand($command, $dateTime, $commandId));
     }

@@ -10,7 +10,7 @@ final class ReceivedScheduledCommand
     private $serialized;
     private $dateTime;
 
-    public function __construct(string $queueName, string $id, string $serialized, \DateTime $dateTime)
+    public function __construct(string $queueName, string $id, string $serialized, \DateTimeInterface $dateTime)
     {
         $this->queueName = $queueName;
         $this->id = $id;
@@ -33,7 +33,7 @@ final class ReceivedScheduledCommand
         return $this->serialized;
     }
 
-    public function getDateTime(): \DateTime
+    public function getDateTime(): \DateTimeInterface
     {
         return $this->dateTime;
     }

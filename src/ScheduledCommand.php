@@ -9,7 +9,7 @@ final class ScheduledCommand implements BusQueCommandInterface
     private $dateTime;
     private $id;
 
-    public function __construct($command, \DateTime $dateTime, string $id = null)
+    public function __construct($command, \DateTimeInterface $dateTime, string $id = null)
     {
         $this->command = $command;
         $this->dateTime = $dateTime;
@@ -21,7 +21,7 @@ final class ScheduledCommand implements BusQueCommandInterface
         return $this->command;
     }
 
-    public function getDateTime(): \DateTime
+    public function getDateTime(): \DateTimeInterface
     {
         return $this->dateTime;
     }

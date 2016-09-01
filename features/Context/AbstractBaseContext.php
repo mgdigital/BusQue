@@ -213,11 +213,11 @@ abstract class AbstractBaseContext implements SnippetAcceptingContext
      */
     public function iScheduleACommandWithIdToRunAt($command, $id, $arg1, $arg2)
     {
-        $time = new \DateTime('@' . mktime($arg1, $arg2));
+        $time = new \DateTimeImmutable('@' . mktime($arg1, $arg2));
         $this->scheduleCommand($command, $time, $id);
     }
 
-    protected function scheduleCommand($command, \DateTime $dateTime, string $id)
+    protected function scheduleCommand($command, \DateTimeInterface $dateTime, string $id)
     {
         $hander = new ScheduledCommandHandler($this->implementation);
         $hander->handleScheduledCommand(new ScheduledCommand($command, $dateTime, $id));
@@ -229,7 +229,7 @@ abstract class AbstractBaseContext implements SnippetAcceptingContext
     public function theCommandWithIdShouldBeScheduledAt($arg1, $arg2, $arg3)
     {
         $time = $this->implementation->getSchedulerDriver()->getScheduledTime('test_queue', $arg1);
-        \PHPUnit_Framework_Assert::assertInstanceOf(\DateTime::class, $time);
+        \PHPUnit_Framework_Assert::assertInstanceOf(\DateTimeInterface::class, $time);
         \PHPUnit_Framework_Assert::assertEquals("$arg2:$arg3", $time->format('H:i'));
     }
 
@@ -238,7 +238,7 @@ abstract class AbstractBaseContext implements SnippetAcceptingContext
      */
     public function theTimeIs($arg1, $arg2)
     {
-        $this->clock->getTime()->willReturn(new \DateTime('@' . mktime($arg1, $arg2)));
+        $this->clock->getTime()->willReturn(new \DateTimeImmutable('@' . mktime($arg1, $arg2)));
     }
 
     /**

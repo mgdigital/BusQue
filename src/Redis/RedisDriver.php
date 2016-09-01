@@ -109,7 +109,7 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
         $this->evalScript('purge_message', [$this->namespace, $queueName, $id]);
     }
 
-    public function scheduleCommand(string $queueName, string $id, string $serialized, \DateTime $dateTime)
+    public function scheduleCommand(string $queueName, string $id, string $serialized, \DateTimeInterface $dateTime)
     {
         $this->evalScript(
             'schedule_message',
@@ -120,13 +120,13 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
     /**
      * @param string $queueName
      * @param string $id
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getScheduledTime(string $queueName, string $id)
     {
         $score = $this->adapter->zScore("{$this->namespace}:schedule", "$queueName||$id");
         if ($score !== null) {
-            return new \DateTime("@$score");
+            return new \DateTimeImmutable("@$score");
         }
     }
 
@@ -135,7 +135,7 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
         $this->purgeCommand($queueName, $id);
     }
 
-    public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTime $end = null)
+    public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTimeInterface $end = null)
     {
         if ($queueNames === null) {
             $queueNames = [ null ];
@@ -151,9 +151,9 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
     }
 
     public function receiveDueCommands(
-        \DateTime $now,
+        \DateTimeInterface $now,
         int $limit = SchedulerWorker::DEFAULT_THROTTLE,
-        \DateTime $startTime = null
+        \DateTimeInterface $startTime = null
     ): array {
         if ($startTime === null) {
             $start = 0;
@@ -173,7 +173,7 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
                 $queueName,
                 $id,
                 $message,
-                new \DateTime('@'.$score)
+                new \DateTimeImmutable('@'.$score)
             );
         }
         return $commands;

@@ -16,7 +16,7 @@ final class SchedulerWorkerSpec extends AbstractSpec
 
     public function it_can_receive_and_queue_a_scheduled_command()
     {
-        $dateTime = new \DateTime();
+        $dateTime = new \DateTimeImmutable();
         $scheduledCommand = new ReceivedScheduledCommand('test_queue', 'test_id', 'serialized', $dateTime);
         $this->clock->getTime()->willReturn($dateTime);
         $this->schedulerDriver->receiveDueCommands($dateTime, 1, null, null)->willReturn([$scheduledCommand]);

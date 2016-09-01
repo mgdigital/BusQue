@@ -50,7 +50,7 @@ final class BusQueSpec extends AbstractSpec
 
     public function it_can_schedule_a_command()
     {
-        $dateTime = new \DateTime();
+        $dateTime = new \DateTimeImmutable();
         $this->commandBusAdapter->handle(new ScheduledCommand('test_command', $dateTime, 'test_id'))->shouldBeCalled();
         $this->scheduleCommand('test_command', $dateTime, 'test_id');
     }

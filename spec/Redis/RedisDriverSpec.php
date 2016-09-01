@@ -115,7 +115,7 @@ class RedisDriverSpec extends ObjectBehavior
 
     public function it_can_schedule_a_command()
     {
-        $date = new \DateTime();
+        $date = new \DateTimeImmutable();
         $timestamp = $date->getTimestamp();
         $lua = $this->getLua('schedule_message');
         $this->adapter->evalLua($lua, ['test', 'test', 'test', 'test', $timestamp])->shouldBeCalled();
@@ -139,7 +139,7 @@ class RedisDriverSpec extends ObjectBehavior
 
     public function it_can_receive_due_scheduled_commands()
     {
-        $date = new \DateTime();
+        $date = new \DateTimeImmutable();
         $timestamp = $date->getTimestamp();
         $lua = $this->getLua('receive_due_messages');
         $this->adapter->evalLua($lua, ['test', 0, $timestamp, SchedulerWorker::DEFAULT_THROTTLE])
