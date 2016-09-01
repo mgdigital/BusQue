@@ -135,8 +135,11 @@ final class RedisDriver implements QueueDriverInterface, SchedulerDriverInterfac
         $this->purgeCommand($queueName, $id);
     }
 
-    public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTimeInterface $end = null)
-    {
+    public function clearSchedule(
+        array $queueNames = null,
+        \DateTimeInterface $start = null,
+        \DateTimeInterface $end = null
+    ) {
         if ($queueNames === null) {
             $queueNames = [ null ];
         }

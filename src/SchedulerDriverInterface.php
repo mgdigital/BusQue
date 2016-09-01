@@ -9,7 +9,11 @@ interface SchedulerDriverInterface
 
     public function cancelScheduledCommand(string $queueName, string $id);
 
-    public function clearSchedule(array $queueNames = null, \DateTime $start = null, \DateTimeInterface $end = null);
+    public function clearSchedule(
+        array $queueNames = null,
+        \DateTimeInterface $start = null,
+        \DateTimeInterface $end = null
+    );
 
     /**
      * @param string $queueName
